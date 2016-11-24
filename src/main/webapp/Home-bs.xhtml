@@ -1,0 +1,94 @@
+<ui:composition template="/WEB-INF/template/Layout-bs.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:fp="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<ui:define name="title">
+		2Path - Home
+	</ui:define>
+	
+	<ui:define name="li-active-home">
+	<li class="active">
+		<a href="#">
+		<i class="fa fa-home"></i> Home</a>
+	</li>
+	</ui:define>
+	
+	<ui:define name="body">
+		<div class="row" style="margin-top:25px">
+			<div class="col-md-6">
+				<h2>
+					About 2Path
+				</h2>
+				<p>
+					2Path is a <b>terpenoid</b> metabolic network
+					modeled and stored using a graph database, which aims to
+					preserve important terpenoid biosynthesis characteristics and
+					mitigate challenges in genome-scale storage metabolic networks.
+				</p>
+				<p>
+					<a class="btn" href="About-bs.xhtml">View details »</a>
+				</p>
+				<br/>
+				<p><b>Terpenoid</b></p>
+				<p>
+					Terpenoids have critical ecological, industrial and
+					commercial relevance. Interactions as signaling for communication
+					intra/inter species, signal molecules to attract pollinating
+					insects, or defense against herbivores and microbes, are protagonized
+					by terpenoids. Due to their chemical composition, many
+					terpenoids possess vast pharmacological applicability in medicine
+					and biotechnology. The biosynthesis of terpenes has been widely
+					studied over the years and today it is known that they can be
+					synthesized from two metabolic pathways: Mevalonate pathway
+					(MVA) and Non-mevalonate pathway (MEP).
+				</p>
+				<p>
+					<a class="btn" href="Terpenoids-bs.xhtml">View details »</a>
+				</p>
+			</div>
+			<div class="col-md-6">
+				<h2>
+					2Path System
+				</h2>
+				<p>
+					
+				</p>
+				<ol>
+					<li>Go to the Search Page</li>
+					<li>Search for</li>
+					<div class="row">
+						<div class="col-md-6">
+						<ul>
+							<li style="list-style-type:none">
+								<h2><i class="fa fa-users"></i></h2></li>
+							<li>A keyword in our database</li>
+							<li>A pathway between two components in our database</li>
+						</ul>
+						<br/>
+						</div>
+						<div class="col-md-6">
+						<ul>
+							<li style="list-style-type:none">
+								<h2><i class="fa fa-user fa-3"></i></h2></li>
+							<li>A keyword in your organisms merged with our database</li>
+							<li>A pathway between two components in your organism merged with our database</li>
+						</ul>
+						<br/>
+						</div>
+					</div>
+					<li>Visualize the data with the 2Path graph</li>
+				</ol>
+				<a href="Search-bs.xhtml" class="btn btn-lg btn-success btn-block">
+					Go to Search Page
+				</a>
+				<a href="Help-bs.xhtml" class="btn btn-lg btn-info btn-block">
+					See Full Example
+				</a>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+  <h:head>
+  	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title><ui:insert name="title">2Path</ui:insert></title>
+
+    <meta name="description" content="Source code generated using layoutit.com"/>
+    <meta name="author" content="LayoutIt!"/>
+
+	<h:outputStylesheet library="css" name="font-awesome.min.css" />
+	<h:outputStylesheet library="css" name="bootstrap.home.css" />
+	<h:outputStylesheet library="css" name="style-home.css" />
+
+  </h:head>
+  <h:body>
+
+    <div class="container-fluid" style="margin-left:75px; margin-right:75px;">
+	<div class="row">
+		<div class="col-md-12">
+			<div id="imagem-2Path">
+				<p:graphicImage library="images" name="graph-home.png"
+				style="width:100%;height:100%;" />
+			</div>
+			<ul class="nav nav-pills">
+				<ui:insert name="li-active-home"><li>
+					<a href="Home-bs.xhtml">
+					<i class="fa fa-home"></i> Home</a>
+				</li>
+				</ui:insert>
+				<ui:insert name="li-active-terpenoid"><li>
+					<a href="Terpenoids-bs.xhtml">
+					<i class="fa fa-sitemap"></i> Terpenoids</a>
+				</li>
+				</ui:insert>
+				<ui:insert name="li-active-search"><li>
+					<a href="Search-bs.xhtml">
+					<i class="fa fa-search"></i> Search</a>
+				</li>
+				</ui:insert>
+				<ui:insert name="li-active-about"><li>
+					<a href="About-bs.xhtml">
+					<i class="fa fa-info-circle"></i> About</a>
+				</li>
+				</ui:insert>
+				<ui:insert name="li-active-help">
+				<li>
+					<a href="Help-bs.xhtml">
+					<i class="fa fa-question-circle"></i> Help</a>
+				</li>
+				</ui:insert>
+				<li class="pull-right disabled">
+					<a href="#">
+					<i class="fa fa-sign-in"></i> Login</a>
+				</li>
+			</ul>
+		</div>
+	</div>	
+  
+  	<ui:insert name="body"></ui:insert>
+  
+  	</div>
+	<script src="js/jquery.home.js"></script>
+    <script src="js/bootstrap.home.js"></script>
+    <script src="js/scripts-home.js"></script>
+  </h:body>
+</html>

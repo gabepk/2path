@@ -1,0 +1,33 @@
+@charset "utf-8";
+
+#imagem-2Path {
+	margin: auto;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #ccc;	
+}
+
+#graph-view {
+	border-style: solid;
+	border-width: 2px;
+	border-color: #ccc;
+}
+
+.ui-inputfield {
+	border: 2px solid #babdb6 !important;
+	box-shadow: none !important;
+	width: 100%;
+}
+
+.ui-inputfield.ui-selectonelistbox {
+	width: 100%;
+}
+
+.logged-in {
+	/*display:none;*/
+}
+
+.not-logged-in {
+	display:none;
+}
+
