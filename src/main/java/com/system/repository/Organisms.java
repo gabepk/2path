@@ -13,14 +13,9 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.w3c.dom.Node;
-
-import com.system.model.SequenceNode;
-import com.system.model.OrganismNode;
 import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
 import org.primefaces.json.JSONObject;
-import org.primefaces.json.JSONTokener;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -40,28 +35,26 @@ public class Organisms implements Serializable {
 		List<Organism> allOrganisms = new ArrayList<>();
 		String responseJson = sendTransactionalCypherQuery("MATCH (n:Organism) RETURN n");
 		
-		// Json: objeto [], array {}
-		// Neo4j: objetos: result (1),  columns, data, 
-		
-		try { 
-			//JSONArray jsonArray = new JSONArray(responseJson);
+		try {
 			JSONObject jsonObj = new JSONObject(responseJson);
-			
 			JSONArray results = jsonObj.getJSONArray("results");
-			//String columns_n = ((JSONObject) results.get(0)).getJSONArray("columns").getString(0);
 			
 			JSONArray data = ((JSONObject) results.get(0)).getJSONArray("data");
-			JSONArray rows = ((JSONObject) data.get(0)).getJSONArray("row");
-			//JSONArray meta = ((JSONObject) data.get(0)).getJSONArray("meta");
-			//JSONObject graph = ((JSONObject) data.get(0)).getJSONObject("graph");
-			 
+			JSONArray rows, meta, graph;
 			String taxname;
-			for (int i = 0; i < rows.length(); i++) {
-				taxname = (String) ((JSONObject) rows.get(i)).get("taxName");
-			 	Organism organism = new Organism(taxname);
-			 	// preencher organismo
-			 	allOrganisms.add(organism);
-			 	i++;
+			for (int i = 0; i < data.length(); i++) {
+				rows = ((JSONObject) data.get(i)).getJSONArray("row");
+				meta = ((JSONObject) data.get(i)).getJSONArray("meta");
+				//graph = ((JSONObject) data.get(i)).getJSONObject("graph");
+				
+				taxname = (String) ((JSONObject) rows.get(0)).get("taxName");
+				Organism organism = new Organism(taxname);
+				organism.setTaxName(taxname);
+				organism.setId((Long) ((JSONObject) meta.get(0)).get("id"));
+				organism.setTaxId((String) ((JSONObject) rows.get(0)).get("taxId"));
+				organism.setTaxRefs((String) ((JSONObject) rows.get(0)).get("taxRefs"));
+				 	
+				allOrganisms.add(organism);
 			}
 		}
 		catch (JSONException e) {
@@ -70,12 +63,20 @@ public class Organisms implements Serializable {
 		
 		return allOrganisms;
 	}
-	public List<String> getKeywordsInOrganism(String organism, String keyword) {
-		List<String> results = new ArrayList<>();
-		return results;
-	}
+	
+	//public List<String> getKeywordsInOrganism(String organism, String keyword) {
+	//	List<String> results = new ArrayList<>();
+	//	return results;
+	//}
+	
 	public List<String> getPathwayInOrganism (String organism, String keyword_1, String keyword_2) {
 		List<String> results = new ArrayList<>();
+		String responseJson = sendTransactionalCypherQuery("MATCH (n:Organism) RETURN n");
+		
+		// Organismo ate reacoes
+		// MATCH (o:Organism {name:"Arabidopsis thaliana"})-[:HAS]->(s:Sequences)-[:MATCHES]->(e:Enzymes)-[:CATALYSE]->(r:Reactions) RETURN o, s, e, r 
+		
+		
 		return results;
 	}
 	
@@ -83,6 +84,9 @@ public class Organisms implements Serializable {
 		String graphJson = "";
 		return graphJson;
 	}
+	
+	
+	
 	
 	
 	
@@ -122,7 +126,7 @@ public class Organisms implements Serializable {
 		SequenceNodeCypher += " })";
 	}*/
 	
-	public static Node getChildByNodeName(Node node, String nodeName) {
+	/*public static Node getChildByNodeName(Node node, String nodeName) {
 		for (Node childNode = node.getFirstChild(); childNode != null;) {
 			Node nextChild = childNode.getNextSibling();
 			if (childNode.getNodeName().equalsIgnoreCase(nodeName)) {
@@ -131,6 +135,6 @@ public class Organisms implements Serializable {
 			childNode = nextChild;
 		}
 		return null;
-	}	
+	}*/
 	
 }

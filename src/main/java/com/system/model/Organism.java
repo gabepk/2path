@@ -1,19 +1,17 @@
 package com.system.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Organism implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private String label; // TODO: Retirar esse atributo
+	private String label;
 	
 	private Long id; // TODO : Mandatory
-	private Long taxId;
+	private String taxId;
 	private String taxName;
-	private List<String> taxRefs = new ArrayList<>();
+	private String taxRefs;
 	
 	public Organism() {
 		
@@ -23,12 +21,10 @@ public class Organism implements Serializable {
 		this.label = label;
 	}
 	
-	// TODO: Retirar esse metodo
 	public String getLabel() {
 		return label;
 	}
 	
-	// TODO: Retirar esse metodo
 	public void setLabel(String label) {
 		this.label = label;
 	}
@@ -41,11 +37,11 @@ public class Organism implements Serializable {
 		this.id = id;
 	}
 
-	public Long getTaxId() {
+	public String getTaxId() {
 		return taxId;
 	}
 
-	public void setTaxId(Long taxId) {
+	public void setTaxId(String taxId) {
 		this.taxId = taxId;
 	}
 
@@ -57,11 +53,11 @@ public class Organism implements Serializable {
 		this.taxName = taxName;
 	}
 
-	public List<String> getTaxRefs() {
+	public String getTaxRefs() {
 		return taxRefs;
 	}
 
-	public void setTaxRefs(List<String> taxRefs) {
+	public void setTaxRefs(String taxRefs) {
 		this.taxRefs = taxRefs;
 	}
 	
@@ -70,11 +66,10 @@ public class Organism implements Serializable {
         StringBuilder builder = new StringBuilder();
 
         builder.append("Organism[");
-        builder.append("id=").append(getId()).append(",");
+        builder.append("id=").append(getId().toString()).append(",");
         builder.append("taxId=").append(getTaxId()).append(",");
         builder.append("taxName=").append(getTaxName()).append(",");
-        builder.append("taxrefs=[").append(getTaxRefs()).append("]");
-        builder.append("]");
+        builder.append("taxRefs=").append(getTaxRefs()).append("]");
 
         return builder.toString();
     }

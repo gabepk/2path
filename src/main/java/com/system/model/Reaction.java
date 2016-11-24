@@ -6,11 +6,11 @@ import java.util.List;
 public class Reaction {
 
 	private Long id; // TODO: Mandatory
+	private String keggLink_Reaction;
+	private String reactionName;
 	private String reactionDescription;
-	private String reactionKEGG;
-	private String reactionBioCyc;
-	private String reactionReversibility;
-	private List<String> reactionRefs = new ArrayList<>();
+	private String keggID_Reaction;
+	private String type;
 
 	public Long getId() {
 		return id;
@@ -18,6 +18,22 @@ public class Reaction {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public String getKeggLink_Reaction() {
+		return keggLink_Reaction;
+	}
+
+	public void setKeggLink_Reaction(String keggLink_Reaction) {
+		this.keggLink_Reaction = keggLink_Reaction;
+	}
+
+	public String getReactionName() {
+		return reactionName;
+	}
+
+	public void setReactionName(String reactionName) {
+		this.reactionName = reactionName;
 	}
 
 	public String getReactionDescription() {
@@ -28,50 +44,33 @@ public class Reaction {
 		this.reactionDescription = reactionDescription;
 	}
 
-	public String getReactionKEGG() {
-		return reactionKEGG;
+	public String getKeggID_Reaction() {
+		return keggID_Reaction;
 	}
 
-	public void setReactionKEGG(String reactionKEGG) {
-		this.reactionKEGG = reactionKEGG;
+	public void setKeggID_Reaction(String keggID_Reaction) {
+		this.keggID_Reaction = keggID_Reaction;
 	}
 
-	public String getReactionBioCyc() {
-		return reactionBioCyc;
+	public String getType() {
+		return type;
 	}
 
-	public void setReactionBioCyc(String reactionBioCyc) {
-		this.reactionBioCyc = reactionBioCyc;
+	public void setType(String type) {
+		this.type = type;
 	}
 
-	public String getReactionReversibility() {
-		return reactionReversibility;
-	}
-
-	public void setReactionReversibility(String reactionReversibility) {
-		this.reactionReversibility = reactionReversibility;
-	}
-
-	public List<String> getReactionRefs() {
-		return reactionRefs;
-	}
-
-	public void setReactionRefs(List<String> reactionRefs) {
-		this.reactionRefs = reactionRefs;
-	}
-	
 	@Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("Organism[");
-        builder.append("id=").append(getId()).append(",");
+        builder.append("Reaction[");
+        builder.append("id=").append(getId().toString()).append(",");
+        builder.append("keggLink_Reaction=").append(getKeggLink_Reaction()).append(",");
+        builder.append("reactionName=").append(getReactionName()).append(",");
         builder.append("reactionDescription=").append(getReactionDescription()).append(",");
-        builder.append("reactionKEGG=").append(getReactionKEGG()).append(",");
-        builder.append("reactionBioCyc=").append(getReactionBioCyc()).append(",");
-        builder.append("reactionReversibility=").append(getReactionReversibility()).append(",");
-        builder.append("reactionRefs=[").append(getReactionRefs()).append("]");
-        builder.append("]");
+        builder.append("keggID_Reaction=").append(getKeggID_Reaction()).append(",");
+        builder.append("type=").append(getType()).append("]");
 
         return builder.toString();
     }
