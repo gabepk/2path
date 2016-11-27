@@ -12,14 +12,14 @@
 	
 	<ui:define name="li-active-search">
 	<li class="active">
-		<a href="Search-bs.xhtml">
+		<a href="Search.xhtml">
 		<i class="fa fa-search"></i> Search</a>
 	</li>
 	</ui:define>
 	
 	<ui:define name="body">
 		<f:metadata>
-    		<fp:viewAction id="resultDeitaisViewAction" name="resultDetails" action="#{viewGraphBean.preRender}" />
+    		<fp:viewAction id="resultsViewAction" name="results" action="#{searchInResultsBean.preRender}" />
     	</f:metadata>
 		<h:form>
 			<div class="row" style="margin-top:25px">
@@ -46,7 +46,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="col-md-8">
+				<div class="col-md-8" id="graph-view">
 					<style>
 						.links line {
 						  stroke: #999;
@@ -136,29 +136,29 @@
 				</div>
 			</div>
 			<div class="row" style="margin-top:100px;">
-				<div class="col-md-2"></div>
-				<div class="col-md-2">
-					<a href="Home-bs.xhtml" class="btn btn-block btn-info">
-						Home
-					</a>
-				</div>
-				<div class="col-md-2">
-					<a href="#" class="btn btn-block btn-warning">
-						New Pathway
-					</a>
-				</div>
-				<div class="col-md-2">
-					<a href="#" class="btn btn-block btn-warning">
-						Update
-					</a>
-				</div>
-				<div class="col-md-2">
-					<a href="Help-bs.xhtml" class="btn btn-block btn-info">
-						Help
-					</a>
-				</div>
-				<div class="col-md-2"></div>
+			<div class="col-md-2"></div>
+			<div class="col-md-2">
+				<a href="#" class="btn btn-block btn-info">
+					New Organism
+				</a>
 			</div>
+			<div class="col-md-2">
+				<a href="#" class="btn btn-block btn-info">
+					New Compound
+				</a>
+			</div>
+			<div class="col-md-2">
+				<a href="#" class="btn btn-block btn-info">
+					New Enzyme
+				</a>
+			</div>
+			<div class="col-md-2">
+				<a href="#" class="btn btn-block btn-info">
+					New Protein
+				</a>
+			</div>
+			<div class="col-md-2"></div>
+		</div>
 		</h:form>
 	</ui:define>
 </ui:composition>

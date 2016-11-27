@@ -1,0 +1,68 @@
+<ui:composition template="/WEB-INF/template/Layout-bs.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:fp="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="title">
+		2Path - Search
+	</ui:define>
+
+	<ui:define name="li-active-search">
+		<li class="active"><a href="Search.xhtml"> <i
+				class="fa fa-search"></i> Search
+		</a></li>
+	</ui:define>
+
+	<ui:define name="body">
+		<f:metadata>
+			<fp:viewAction id="compoundsViewAction" name="compounds"
+				action="#{searchPathwayBean.preRender}" />
+		</f:metadata>
+		<h:form>
+			<div class="row" style="margin-top: 25px">
+				<p:messages autoUpdate="true" closable="true" />
+			</div>
+			<div class="row">
+				<div class="col-md-4">
+					<h2>
+						Search for a pathway
+					</h2>
+					<p>
+						Enter the name of a Compound
+						<!--<ul style="list-style-type:none">
+							<li><font color="#4545FF"><b>Component</b></font> 
+								(<font color="#4545FF">Product</font> or 
+								<font color="#4545FF">Substract</font>)</li>
+							<li><font color="#23DD23"><b>Enzyme</b></font></li>
+							<li><font color="#4545FF"><b>Reaction</b></font></li>
+						</ul>-->
+					</p>
+					<h:panelGroup>
+						
+							<p:outputLabel value="From" for="searchInput_1"/>
+							<p:autoComplete id="searchInput_1" value="#{searchPathwayBean.keyword_1}" 
+								completeMethod="#{searchPathwayBean.sugerirKeywords}" required="true"
+								forceSelection="false" var="key_1" itemLabel="#{key_1}" itemValue="#{key_1}" 
+								style="margin-top:20px; margin-bottom:50px" maxResults="10"/>
+							<p:watermark for="searchInput_1" value="Enter a substract" id="watermark_1" />
+						
+							<p:outputLabel value="To" for="searchInput_2"/>
+							<p:autoComplete id="searchInput_2" value="#{searchPathwayBean.keyword_2}" 
+								completeMethod="#{searchPathwayBean.sugerirKeywords}" required="true"
+								forceSelection="false" var="key_2" itemLabel="#{key_2}" itemValue="#{key_2}" 
+								style="margin-top:20px; margin-bottom:50px" maxResults="10"/>
+							<p:watermark for="searchInput_2" value="Enter a product" id="watermark_2" />
+						
+							<p:commandButton class="btn btn-block btn-success" value="Search" for="searchInput_1" 
+								action="#{searchPathwayBean.searchKeyword}" ajax="false" icon="ui-icon-search"/>
+						
+					</h:panelGroup>	
+				</div>
+				<div class="col-md-8">Grafo</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

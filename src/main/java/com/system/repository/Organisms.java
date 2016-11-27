@@ -24,7 +24,7 @@ public class Organisms implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public List<Organism> getAllOrganisms() throws JSONException {
+	public List<Organism> getAllOrganisms() {
 		List<Organism> allOrganisms = new ArrayList<>();
 		String payload = "{\"statements\" : [ {\"statement\" : \"MATCH (n:Organism) RETURN n\"} ]}";
 		String responseJson = sendTransactionalCypherQuery(payload);
@@ -34,7 +34,7 @@ public class Organisms implements Serializable {
 			JSONArray results = jsonObj.getJSONArray("results");
 			
 			JSONArray data = ((JSONObject) results.get(0)).getJSONArray("data");
-			JSONArray rows, meta, graph;
+			JSONArray rows, meta;
 			String taxname;
 			for (int i = 0; i < data.length(); i++) {
 				rows = ((JSONObject) data.get(i)).getJSONArray("row");
@@ -57,10 +57,28 @@ public class Organisms implements Serializable {
 		return allOrganisms;
 	}
 	
-	//public List<String> getKeywordsInOrganism(String organism, String keyword) {
-	//	List<String> results = new ArrayList<>();
-	//	return results;
-	//}
+	public List<String> getAllCompounds () {
+		List<String> allCompounds = new ArrayList<>();
+		String payload = "{\"statements\" : [ {\"statement\" : \"MATCH (n:Compounds) RETURN n\"} ]}";
+		String responseJson = sendTransactionalCypherQuery(payload);
+		
+		try {
+			JSONObject jsonObj = new JSONObject(responseJson);
+			JSONArray results = jsonObj.getJSONArray("results");
+			
+			JSONArray data = ((JSONObject) results.get(0)).getJSONArray("data");
+			JSONArray rows;
+			for (int i = 0; i < data.length(); i++) {
+				rows = ((JSONObject) data.get(i)).getJSONArray("row");
+				allCompounds.add( (String) ((JSONObject) rows.get(0)).get("compoundName") );
+			}
+		}
+		catch (JSONException e) {
+			System.out.println("unexpected JSON exception : " + e);
+		}
+		
+		return allCompounds;
+	}
 	
 	public Boolean getPathwayInOrganism (String organism, String component_1, String component_2) {
 		List<String> Matched_reactions_ids = new ArrayList<>();
@@ -104,7 +122,6 @@ public class Organisms implements Serializable {
 			results = jsonObj.getJSONArray("results");
 			
 			data = ((JSONObject) results.get(0)).getJSONArray("data");
-			//meta = ((JSONObject) data.get(0)).getJSONArray("meta");
 			graph = ((JSONObject) data.get(0)).getJSONObject("graph");
 			nodeGroup = graph.getJSONArray("nodes");
 			
@@ -132,11 +149,6 @@ public class Organisms implements Serializable {
 		return graphJson;
 	}
 	
-	
-	
-	
-	
-	
 	private static String sendTransactionalCypherQuery(String payload) {
 		final String txUri = SERVER_ROOT_URI + "transaction/commit";
 		WebResource resource = Client.create().resource(txUri);
@@ -156,32 +168,5 @@ public class Organisms implements Serializable {
 		String responseJson = response.getEntity(String.class);
 		response.close();
 		return responseJson;
-	}
-	
-	/*public static void buildCypherQueryToSearchPathway(
-			SequenceNode sequenceNode, OrganismNode o1, OrganismNode o2) {
-		SequenceNodeCypher += "submissionID : '"
-				+ sequenceNode.getSubmissionID() + "'";
-
-		SequenceNodeCypher += ", submitedSequenceName : '"
-				+ sequenceNode.getSubmitedSequenceName() + "'";
-
-		SequenceNodeCypher += ", submitedSequence : '"
-				+ sequenceNode.getSubmitedSequence() + "'";
-
-		SequenceNodeCypher += ", ecNumber : '" + sequenceNode.getEc() + "'";
-		SequenceNodeCypher += " })";
-	}*/
-	
-	/*public static Node getChildByNodeName(Node node, String nodeName) {
-		for (Node childNode = node.getFirstChild(); childNode != null;) {
-			Node nextChild = childNode.getNextSibling();
-			if (childNode.getNodeName().equalsIgnoreCase(nodeName)) {
-				return childNode;
-			}
-			childNode = nextChild;
-		}
-		return null;
-	}*/
-	
+	}	
 }

@@ -18,13 +18,9 @@ public class SearchInOrganismServico implements Serializable {
 	@Inject
 	private Organisms organisms;
 	
-	public List<Organism> getAllOrganisms() throws JSONException {
+	public List<Organism> getAllOrganisms() {
 		return organisms.getAllOrganisms();
 	}
-	
-	//public List<String> getKeywordsInOrganism(String keyword, String organism) {
-	//	return organisms.getKeywordsInOrganism(keyword, organism);
-	//}
 	
 	public String getGraphDataInJson(String result) {
 		return organisms.getGraphDataInJson(result);
@@ -34,4 +30,8 @@ public class SearchInOrganismServico implements Serializable {
 		return organisms.getPathwayInOrganism(organism, keyword_1, keyword_2);
 	}
 
+	public List<String> getAllCompounds () {
+		return organisms.getAllCompounds();
+	}
+	
 }

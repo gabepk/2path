@@ -37,7 +37,7 @@ public class LoginBean implements Serializable{
 	
 	public void singIn() throws ServletException, IOException {
 	    request.getSession().setAttribute("username", username);
-	    response.sendRedirect("/EnzymeGraph/Home-bs.xhtml");
+	    response.sendRedirect("/EnzymeGraph/Home.xhtml");
 		
 		facesContext.responseComplete();
 	}

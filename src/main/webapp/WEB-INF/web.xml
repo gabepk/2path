@@ -14,7 +14,7 @@
 	</resource-env-ref>
 
 	<welcome-file-list>
-		<welcome-file>Home-bs.xhtml</welcome-file>
+		<welcome-file>Home.xhtml</welcome-file>
 	</welcome-file-list>
 
 	<servlet>

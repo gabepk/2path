@@ -1,0 +1,34 @@
+<ui:composition template="/WEB-INF/template/Layout-bs.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:fp="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:define name="title">
+		2Path - Search
+	</ui:define>
+
+	<ui:define name="li-active-search">
+		<li class="active"><a href="Search.xhtml"> <i
+				class="fa fa-search"></i> Search
+		</a></li>
+	</ui:define>
+
+	<ui:define name="body">
+		<f:metadata>
+			<fp:viewAction id="organismsViewAction" name="organisms"
+				action="#{searchInOrganismBean.preRender}" />
+		</f:metadata>
+		<h:form>
+			<div class="row" style="margin-top: 25px">
+				<p:messages autoUpdate="true" closable="true" />
+			</div>
+			<div class="row">
+				<div class="col-md-4">Formulario</div>
+				<div class="col-md-8">Grafo</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
