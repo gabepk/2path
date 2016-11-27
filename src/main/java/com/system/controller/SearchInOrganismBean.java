@@ -45,8 +45,8 @@ public class SearchInOrganismBean implements Serializable {
 	public static List<Organism> organisms = new ArrayList<>();
 	
 	static {
-    	KEYWORDS.add("Pathway");
-    	KEYWORDS.add("Organism");
+    	KEYWORDS.add("1-Deoxy-D-xylulose 5-phosphate");
+    	KEYWORDS.add("2-Phospho-4-(cytidine 5'-diphospho)-2-C-methyl-D-erythritol");
     	KEYWORDS.add("Water");
 		KEYWORDS.add("Biology");
 		KEYWORDS.add("Melanine");
@@ -59,6 +59,11 @@ public class SearchInOrganismBean implements Serializable {
 	public void preRender() throws JSONException {
 		organisms = searchInOrganismServico.getAllOrganisms();
 	}
+	
+	/*public String preRender() {
+		String x = "oi";
+		return x;
+	}*/
 	
 	public SearchInOrganismBean() {
 	}

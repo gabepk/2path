@@ -2,15 +2,15 @@ package com.system.model;
 
 public class Compound {
 
-	private Long id; // TODO: Mandatory
+	private Integer id; // TODO: Mandatory
 	private String keggID_compound;
 	private String compoundName;
 	
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 	

@@ -8,7 +8,7 @@ public class Organism implements Serializable {
 	
 	private String label;
 	
-	private Long id; // TODO : Mandatory
+	private Integer id; // TODO : Mandatory
 	private String taxId;
 	private String taxName;
 	private String taxRefs;
@@ -29,11 +29,11 @@ public class Organism implements Serializable {
 		this.label = label;
 	}
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

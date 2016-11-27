@@ -5,18 +5,18 @@ import java.util.List;
 
 public class Reaction {
 
-	private Long id; // TODO: Mandatory
+	private Integer id; // TODO: Mandatory
 	private String keggLink_Reaction;
 	private String reactionName;
 	private String reactionDescription;
 	private String keggID_Reaction;
 	private String type;
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 	

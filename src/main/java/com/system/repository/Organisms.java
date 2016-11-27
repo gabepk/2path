@@ -1,14 +1,7 @@
 package com.system.repository;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -33,7 +26,8 @@ public class Organisms implements Serializable {
 	
 	public List<Organism> getAllOrganisms() throws JSONException {
 		List<Organism> allOrganisms = new ArrayList<>();
-		String responseJson = sendTransactionalCypherQuery("MATCH (n:Organism) RETURN n");
+		String payload = "{\"statements\" : [ {\"statement\" : \"MATCH (n:Organism) RETURN n\"} ]}";
+		String responseJson = sendTransactionalCypherQuery(payload);
 		
 		try {
 			JSONObject jsonObj = new JSONObject(responseJson);
@@ -45,13 +39,12 @@ public class Organisms implements Serializable {
 			for (int i = 0; i < data.length(); i++) {
 				rows = ((JSONObject) data.get(i)).getJSONArray("row");
 				meta = ((JSONObject) data.get(i)).getJSONArray("meta");
-				//graph = ((JSONObject) data.get(i)).getJSONObject("graph");
 				
 				taxname = (String) ((JSONObject) rows.get(0)).get("taxName");
 				Organism organism = new Organism(taxname);
 				organism.setTaxName(taxname);
-				organism.setId((Long) ((JSONObject) meta.get(0)).get("id"));
-				organism.setTaxId((String) ((JSONObject) rows.get(0)).get("taxId"));
+				organism.setId((Integer)     ((JSONObject) meta.get(0)).get("id"));
+				organism.setTaxId((String)   ((JSONObject) rows.get(0)).get("taxId"));
 				organism.setTaxRefs((String) ((JSONObject) rows.get(0)).get("taxRefs"));
 				 	
 				allOrganisms.add(organism);
@@ -69,15 +62,69 @@ public class Organisms implements Serializable {
 	//	return results;
 	//}
 	
-	public List<String> getPathwayInOrganism (String organism, String keyword_1, String keyword_2) {
-		List<String> results = new ArrayList<>();
-		String responseJson = sendTransactionalCypherQuery("MATCH (n:Organism) RETURN n");
-		
+	public Boolean getPathwayInOrganism (String organism, String component_1, String component_2) {
+		List<String> Matched_reactions_ids = new ArrayList<>();
+		JSONObject jsonObj, graph, node;
+		JSONArray results, data, meta, nodeGroup;
+		String query, payload;
 		// Organismo ate reacoes
-		// MATCH (o:Organism {name:"Arabidopsis thaliana"})-[:HAS]->(s:Sequences)-[:MATCHES]->(e:Enzymes)-[:CATALYSE]->(r:Reactions) RETURN o, s, e, r 
+		query = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
+				"-[:HAS]->(s:Sequences)-[:MATCHES]->(e:Enzymes)-[:CATALYSE]->(r1:Reactions) RETURN r1";
+		payload = "{\"statements\" : [ {\"statement\" : \"" + query + "\", \"parameters\": null," +
+				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
+		String organism_to_reactions = sendTransactionalCypherQuery(payload);
 		
+		// Caminho entre dois compostos
+		query = "MATCH (c1:Compounds{compoundName:\\\""+ 
+				component_1 +"\\\"})-[r2*]->(c2:Compounds{compoundName:\\\""+ component_2 +"\\\"}) RETURN r2";
+		payload = "{\"statements\" : [ {\"statement\" : \"" + query + "\", \"parameters\": null," +
+				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
+		String path_between_components = sendTransactionalCypherQuery(payload);
+				
+		try {
+			// Adiciona em Matched_reactions_ids as 
+			// reacoes que sao catalizadas por enzimas 
+			// cuja sequencia foi encontrada no organismo
+			
+			jsonObj = new JSONObject(organism_to_reactions);
+			results = jsonObj.getJSONArray("results");
+			
+			data = ((JSONObject) results.get(0)).getJSONArray("data");
+			
+			for (int i = 0; i < data.length(); i++) {
+				meta = ((JSONObject) data.get(i)).getJSONArray("meta");
+				
+				Matched_reactions_ids.add(((JSONObject) meta.get(0)).get("id").toString());
+			}
+			
+			// Verifica se todas as reações do caminho
+			// entre os compostos estao em Matched_reactions_ids
+			
+			jsonObj = new JSONObject(path_between_components);
+			results = jsonObj.getJSONArray("results");
+			
+			data = ((JSONObject) results.get(0)).getJSONArray("data");
+			//meta = ((JSONObject) data.get(0)).getJSONArray("meta");
+			graph = ((JSONObject) data.get(0)).getJSONObject("graph");
+			nodeGroup = graph.getJSONArray("nodes");
+			
+			for (int i = 0; i < nodeGroup.length(); i++) {
+				node = ((JSONObject) nodeGroup.get(i));
+				
+				if ( ((String) (node.getJSONArray("labels")).get(0)) . equals("Reactions") ) {
+					if ( !Matched_reactions_ids.contains(node.get("id").toString()) ) {
+						return false;
+					}
+				}
+			}
+			
+		}
+		catch (JSONException e) {
+			System.out.println("unexpected JSON exception : " + e);
+			return false;
+		}
 		
-		return results;
+		return true;
 	}
 	
 	public String getGraphDataInJson(String result) {
@@ -90,12 +137,12 @@ public class Organisms implements Serializable {
 	
 	
 	
-	private static String sendTransactionalCypherQuery(String query) {
+	private static String sendTransactionalCypherQuery(String payload) {
 		final String txUri = SERVER_ROOT_URI + "transaction/commit";
 		WebResource resource = Client.create().resource(txUri);
 		resource.addFilter(new HTTPBasicAuthFilter("neo4j","213546")); 
-		String payload = "{\"statements\" : [ {\"statement\" : \"" + query
-				+ "\"} ]}";
+		//String payload = "{\"statements\" : [ {\"statement\" : \"" + query
+		//		+ "\"} ]}";
 		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON)
 				.type(MediaType.APPLICATION_JSON).entity(payload)
 				.get(ClientResponse.class);

@@ -30,7 +30,7 @@ public class SearchInOrganismServico implements Serializable {
 		return organisms.getGraphDataInJson(result);
 	}
 	
-	public List<String> getPathwayInOrganism (String organism, String keyword_1, String keyword_2) {
+	public Boolean getPathwayInOrganism (String organism, String keyword_1, String keyword_2) {
 		return organisms.getPathwayInOrganism(organism, keyword_1, keyword_2);
 	}
 

@@ -36,13 +36,15 @@ public class SearchInResultsBean implements Serializable {
 	private HttpServletResponse response;
 	
 	public static List<String> results = new ArrayList<>();
+	
+	private Boolean path_between_components;
 	private String resultSelected;
 	
 	public void preRender() {
 		System.out.println("Organismo pra procurar: " + request.getSession().getAttribute("organismSelected"));
 		System.out.println("Keyword pra procurar: " + request.getSession().getAttribute("keyword"));
 		
-		System.out.println("Keyword_!: " + request.getSession().getAttribute("keyword_1"));
+		System.out.println("Keyword_1: " + request.getSession().getAttribute("keyword_1"));
 		System.out.println("Keyword_2: " + request.getSession().getAttribute("keyword_2"));
 		
 		/*if (request.getSession().getAttribute("organismSelected") != null &&
@@ -57,10 +59,11 @@ public class SearchInResultsBean implements Serializable {
 				request.getSession().getAttribute("keyword_1") != null &&
 				request.getSession().getAttribute("keyword_2") != null)
 		{
-			results = searchInOrganismServico.getPathwayInOrganism(
+			path_between_components = searchInOrganismServico.getPathwayInOrganism(
 					request.getSession().getAttribute("organismSelected").toString(),
 					request.getSession().getAttribute("keyword_1").toString(),
 					request.getSession().getAttribute("keyword_2").toString());
+			results.add(path_between_components.toString());
 		}
 		
 		

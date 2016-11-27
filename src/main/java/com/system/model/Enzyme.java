@@ -5,16 +5,16 @@ import java.util.List;
 
 public class Enzyme {
 
-	private Long id; // TODO: Mandatory
+	private Integer id; // TODO: Mandatory
 	private String enzymeAlternativeName;
 	private String ecNumber;
 	private String enzymeName;
 	
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 	

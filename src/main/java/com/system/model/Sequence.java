@@ -2,15 +2,15 @@ package com.system.model;
 
 public class Sequence {
 	
-	private Long id;
+	private Integer id;
 	private String taxId;
 	private String ecNumber;
 	private String seqFasta;
 	
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 	public String getTaxId() {
