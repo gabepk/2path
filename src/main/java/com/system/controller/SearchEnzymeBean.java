@@ -1,7 +1,8 @@
 package com.system.controller;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -30,7 +31,7 @@ public class SearchEnzymeBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String JSON_FILE_PATH = "curso-primefaces/EnzymeGraph/src/main/webapp/pathway.json";
+	private static final String GRAPH_JSON_FILE_PATH = "curso-primefaces/EnzymeGraph/src/main/webapp/resources/json/graph.json";
 	
 	@Inject
 	private SearchInOrganismServico searchInOrganismServico; 
@@ -63,7 +64,6 @@ public class SearchEnzymeBean implements Serializable {
 		response.sendRedirect("#");
 		facesContext.responseComplete();
 		
-		parseJsonFile();
 		return true;
 	}
 
@@ -78,21 +78,29 @@ public class SearchEnzymeBean implements Serializable {
 		return keywordsSugested;
 	}
 
-	public Boolean buildGraph() {
+	private Boolean buildGraph() {
 		System.out.println("Organism: "+ organism);
 		System.out.println("Enzyme: "+ ec);
 		
 		try {
 			// Overwrites the file if it already exists
-			File f = new File(JSON_FILE_PATH);
-			PrintWriter jsonFile = new PrintWriter(f);
-			String jsonNeo4j = searchInOrganismServico.getJsonForEnzyme(organism, ec);
-			if (!jsonNeo4j.isEmpty()) {
-				jsonFile.write(jsonNeo4j);
+			File f = new File(GRAPH_JSON_FILE_PATH);
+			PrintWriter jsonFile = null;
+			if (f.exists()) {
+				f.setWritable(true);
+				f.setReadable(true);
+				jsonFile = new PrintWriter(f);
+				String jsonNeo4j = searchInOrganismServico.getJsonForEnzyme(organism, ec);
+				
+				if (!jsonNeo4j.isEmpty()) {
+					//jsonNeo4j = parseNeo4jResult(jsonNeo4j);
+					jsonFile.write(jsonNeo4j);
+					jsonFile.write("");
+					jsonFile.close();
+					return true;
+				}
 				jsonFile.close();
-				return true;
 			}
-			jsonFile.close();
 		}
 		catch (IOException e) {
 			System.out.println("unexpected IO issue: " + e);
@@ -100,17 +108,12 @@ public class SearchEnzymeBean implements Serializable {
 		return false;
 	}
 	
-	public void parseJsonFile() {
-		try {
-		File f = new File(JSON_FILE_PATH);
-		PrintWriter jsonFile = new PrintWriter(f);
-		}
-		catch (IOException e) {
-			System.out.println("unexpected IO issue: " + e);
-			
-		}
+	/*private String parseNeo4jResult(String jsonNeo4j) {
+		String graph;
 		
-	}
+		
+		return "";
+	}*/
 	
 	public String getEc() {
 		return ec;
