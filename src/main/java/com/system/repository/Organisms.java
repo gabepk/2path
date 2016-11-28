@@ -80,6 +80,60 @@ public class Organisms implements Serializable {
 		return allCompounds;
 	}
 	
+	public List<String> getAllEnzymes () {
+		List<String> allEnzymes = new ArrayList<>();
+		String payload = "{\"statements\" : [ {\"statement\" : \"MATCH (n:Enzymes) RETURN n\"} ]}";
+		String responseJson = sendTransactionalCypherQuery(payload);
+		
+		try {
+			JSONObject jsonObj = new JSONObject(responseJson);
+			JSONArray results = jsonObj.getJSONArray("results");
+			
+			JSONArray data = ((JSONObject) results.get(0)).getJSONArray("data");
+			JSONArray rows;
+			for (int i = 0; i < data.length(); i++) {
+				rows = ((JSONObject) data.get(i)).getJSONArray("row");
+				allEnzymes.add( (String) ((JSONObject) rows.get(0)).get("ecNumber") );
+			}
+		}
+		catch (JSONException e) {
+			System.out.println("unexpected JSON exception : " + e);
+		}
+		
+		return allEnzymes;
+	}
+	
+	public String getGraphDataInJson(String result) {
+		String graphJson = "";
+		return graphJson;
+	}
+	
+	public String getJsonForEnzyme(String organism, String ec) {
+		JSONObject jsonObj, graph;
+		JSONArray results, data;
+		String query, payload;
+		
+		query = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
+				"-[h:HAS]->(s:Sequences)-[m:MATCHES]->(e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]->(r:Reactions) " + 
+				"RETURN o, s, e, r, h, m, c";
+		payload = "{\"statements\" : [ {\"statement\" : \"" + query + "\", \"parameters\": null," +
+				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
+		String organism_to_reactions = sendTransactionalCypherQuery(payload);
+		
+		try {
+			jsonObj = new JSONObject(organism_to_reactions);
+			results = jsonObj.getJSONArray("results");
+			data = ((JSONObject) results.get(0)).getJSONArray("data");
+			graph = ((JSONObject) data.get(0)).getJSONObject("graph");
+		}
+		catch (JSONException e) {
+			System.out.println("unexpected JSON exception : " + e);
+			return "";
+		}
+		
+		return graph.toString();
+	}
+	
 	public Boolean getPathwayInOrganism (String organism, String component_1, String component_2) {
 		List<String> Matched_reactions_ids = new ArrayList<>();
 		JSONObject jsonObj, graph, node;
@@ -142,11 +196,6 @@ public class Organisms implements Serializable {
 		}
 		
 		return true;
-	}
-	
-	public String getGraphDataInJson(String result) {
-		String graphJson = "";
-		return graphJson;
 	}
 	
 	private static String sendTransactionalCypherQuery(String payload) {

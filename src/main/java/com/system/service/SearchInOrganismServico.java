@@ -22,16 +22,24 @@ public class SearchInOrganismServico implements Serializable {
 		return organisms.getAllOrganisms();
 	}
 	
+	public List<String> getAllCompounds () {
+		return organisms.getAllCompounds();
+	}
+	
+	public List<String> getAllEnzymes () {
+		return organisms.getAllEnzymes();
+	}
+	
 	public String getGraphDataInJson(String result) {
 		return organisms.getGraphDataInJson(result);
 	}
 	
+	public String getJsonForEnzyme(String organism, String ec) {
+		return organisms.getJsonForEnzyme(organism, ec);
+	}
+	
 	public Boolean getPathwayInOrganism (String organism, String keyword_1, String keyword_2) {
 		return organisms.getPathwayInOrganism(organism, keyword_1, keyword_2);
-	}
-
-	public List<String> getAllCompounds () {
-		return organisms.getAllCompounds();
 	}
 	
 }

@@ -50,10 +50,11 @@ public class SearchInOrganismBean implements Serializable {
 	}
 	
 	public void searchEnzymeInOrganism() throws ServletException, IOException {
-		System.out.println("organismSelected: "+ organismSelected);
-		request.getSession().setAttribute("organismSelected", organismSelected.getTaxName());
+		request.getSession().setAttribute("organismSelected", (String) organismSelected.getTaxName());
 	    response.sendRedirect("/EnzymeGraph/SearchEnzyme.xhtml");
 		
+	    System.out.println("organismSelected: "+ organismSelected.getTaxName());
+	    
 		facesContext.responseComplete();
 	}
 	

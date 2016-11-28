@@ -35,11 +35,10 @@ public class SearchPathwayBean implements Serializable {
 	@Inject
 	private HttpServletRequest request;
 	
-	@Inject
-	private HttpServletResponse response;
+	/*@Inject
+	private HttpServletResponse response;*/
 	
-	private Organism organismSelected;
-	private String keyword_1, keyword_2;
+	private String organism, substract, product;
 	
 	public static List<String> compounds = new ArrayList<>();
 	
@@ -51,19 +50,12 @@ public class SearchPathwayBean implements Serializable {
 	}
 	
 	public void searchPathwayInOrganism() throws ServletException, IOException {
-		System.out.println("organismSelected: "+ organismSelected);
-		System.out.println("keyword 1: "+ keyword_1);
-		System.out.println("keyword 2: "+ keyword_2);
-		
-		request.getSession().setAttribute("organismSelected", organismSelected.getTaxName());
-		request.getSession().setAttribute("keyword_1", keyword_1);
-		request.getSession().setAttribute("keyword_2", keyword_2);
-	    //response.sendRedirect("/EnzymeGraph/SearchPathway.xhtml"); // AJAX TRUE + GRAFO ou FALSE
-		
+		organism = (String) request.getSession().getAttribute("organismSelected");
+		buildGraph();
 		facesContext.responseComplete();
 	}
 
-	public List<String> sugerirKeywords(String consulta) {
+	public List<String> suggestKeywords(String consulta) {
 		List<String> keywordsSugested = new ArrayList<>();
 		
 		for (String key : compounds) {
@@ -73,25 +65,26 @@ public class SearchPathwayBean implements Serializable {
         }
 		return keywordsSugested;
 	}
+
+	public void buildGraph() {
+		System.out.println("Organism: "+ organism);
+		System.out.println("Substract: "+ substract);
+		System.out.println("Product: "+ product);
+	}
 	
-
-	public Organism getOrganismSelected() {
-		return organismSelected;
+	public String getSubstract() {
+		return substract;
 	}
 
-	public String getKeyword_1() {
-		return keyword_1;
+	public void setSubstract(String substract) {
+		this.substract = substract;
+	}
+	public String getProduct() {
+		return product;
 	}
 
-	public void setKeyword_1(String keyword_1) {
-		this.keyword_1 = keyword_1;
-	}
-	public String getKeyword_2() {
-		return keyword_2;
-	}
-
-	public void setKeyword_2(String keyword_2) {
-		this.keyword_2 = keyword_2;
+	public void setProduct(String product) {
+		this.product = product;
 	}
 	
 	public List<String> getCompounds() {
