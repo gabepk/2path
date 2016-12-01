@@ -43,10 +43,23 @@ public class SearchInOrganismBean implements Serializable {
 	public static List<Organism> organisms = new ArrayList<>();
 	
 	public void preRender() {
+		// TODO Verificar se Neo4j esta on. Se nao estiver, ligar remotamente. Como ????
 		organisms = searchInOrganismServico.getAllOrganisms();
 	}
 	
 	public SearchInOrganismBean() {
+	}
+	
+	public void searchEnzyme() throws ServletException, IOException {
+		request.getSession().setAttribute("organismSelected", "");
+	    response.sendRedirect("/EnzymeGraph/SearchEnzyme.xhtml");
+		facesContext.responseComplete();
+	}
+	
+	public void searchPathway() throws ServletException, IOException {
+		request.getSession().setAttribute("organismSelected", "");
+	    response.sendRedirect("/EnzymeGraph/SearchPathway.xhtml");
+		facesContext.responseComplete();
 	}
 	
 	public void searchEnzymeInOrganism() throws ServletException, IOException {

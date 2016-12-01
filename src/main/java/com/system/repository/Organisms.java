@@ -17,6 +17,13 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.system.model.Organism;
 
 public class Organisms implements Serializable {
+	
+	
+	// TODO Iterar sobre data (tem 2 elementos se grafo tem duas partiçoes) e também sobre nodes (nos de cada particao)
+	// Se buscar dados sem arestas, iterar sobre data (cada no é uma particao)
+	// Se bucar com arestas, tratar das particoes
+	
+	
 
 	private static final String SERVER_ROOT_URI = "http://localhost:7474/db/data/";
 	
@@ -103,35 +110,80 @@ public class Organisms implements Serializable {
 		return allEnzymes;
 	}
 	
-	public String getGraphDataInJson(String result) {
-		String graphJson = "";
-		return graphJson;
-	}
-	
 	public String getJsonForEnzyme(String organism, String ec) {
-		JSONObject jsonObj, graph;
+		JSONObject jsonObj;
 		JSONArray results, data;
 		String query, payload;
 		
-		query = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
-				"-[h:HAS]->(s:Sequences)-[m:MATCHES]->(e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]->(r:Reactions) " + 
-				"RETURN o, s, e, r, h, m, c";
+		if (organism.isEmpty()) {
+			query = "MATCH (e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]->(r:Reactions)-[]-(co:Compounds) RETURN e, c, r, co";
+		}
+		else {
+			query = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
+					"-[h:HAS]->(s:Sequences)-[m:MATCHES]->(e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]->(r:Reactions)" + 
+					"-[]-(co:Compounds) RETURN o, s, e, r, h, m, c, co";
+		}
 		payload = "{\"statements\" : [ {\"statement\" : \"" + query + "\", \"parameters\": null," +
 				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
-		String organism_to_reactions = sendTransactionalCypherQuery(payload);
+		String responseNeo4j = sendTransactionalCypherQuery(payload);
 		
 		try {
-			jsonObj = new JSONObject(organism_to_reactions);
+			jsonObj = new JSONObject(responseNeo4j);
 			results = jsonObj.getJSONArray("results");
 			data = ((JSONObject) results.get(0)).getJSONArray("data");
-			graph = ((JSONObject) data.get(0)).getJSONObject("graph");
 		}
 		catch (JSONException e) {
 			System.out.println("unexpected JSON exception : " + e);
 			return "";
 		}
 		
-		return graph.toString();
+		return data.toString();
+	}
+	
+	public List<String> getJsonForPathway(String organism, String substract, String product) {
+		JSONObject jsonObj;
+		JSONArray results, data;
+		String query_1, query_2, payload;
+		List<String> two_datas = new ArrayList<>();
+		
+		query_1 = "MATCH (c1:Compounds{compoundName:\\\""+ 
+				substract +"\\\"})-[r2*]->(c2:Compounds{compoundName:\\\""+ product +"\\\"}) " +
+				"RETURN c1, r2, c2";
+		payload = "{\"statements\" : [ {\"statement\" : \"" + query_1 + "\", \"parameters\": null," +
+				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
+		String path_between_components = sendTransactionalCypherQuery(payload);
+		
+		
+		try {
+			jsonObj = new JSONObject(path_between_components);
+			results = jsonObj.getJSONArray("results");
+			data = ((JSONObject) results.get(0)).getJSONArray("data");
+			
+			if (data.isNull(0)) return null; // Nao existe caminho entre eles
+			
+			two_datas.add(data.toString());
+			
+			if (!organism.isEmpty()) {
+				query_2 = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
+					    "-[h:HAS]->(s:Sequences)-[m:MATCHES]->(e:Enzymes)-[c:CATALYSE]->(r:Reactions) "+
+						"RETURN o, h, s, m, e, c, r, co";
+				payload = "{\"statements\" : [ {\"statement\" : \"" + query_1 + "\", \"parameters\": null," +
+						"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
+				String organism_to_reactions = sendTransactionalCypherQuery(payload);
+				
+				jsonObj = new JSONObject(path_between_components);
+				results = jsonObj.getJSONArray("results");
+				data = ((JSONObject) results.get(0)).getJSONArray("data");
+				two_datas.add(data.toString());
+				
+			}
+		}
+		catch (JSONException e) {
+			System.out.println("unexpected JSON exception : " + e);
+			return null;
+		}
+		
+		return two_datas;
 	}
 	
 	public Boolean getPathwayInOrganism (String organism, String component_1, String component_2) {

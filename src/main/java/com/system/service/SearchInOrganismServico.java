@@ -30,12 +30,12 @@ public class SearchInOrganismServico implements Serializable {
 		return organisms.getAllEnzymes();
 	}
 	
-	public String getGraphDataInJson(String result) {
-		return organisms.getGraphDataInJson(result);
-	}
-	
 	public String getJsonForEnzyme(String organism, String ec) {
 		return organisms.getJsonForEnzyme(organism, ec);
+	}
+	
+	public List<String> getJsonForPathway(String organism, String substract, String product) {
+		return organisms.getJsonForPathway(organism, substract, product);
 	}
 	
 	public Boolean getPathwayInOrganism (String organism, String keyword_1, String keyword_2) {

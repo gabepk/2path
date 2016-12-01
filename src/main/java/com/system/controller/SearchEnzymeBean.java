@@ -19,7 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
+import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
+import org.primefaces.json.JSONObject;
 
 import com.system.model.Organism;
 import com.system.service.SearchInOrganismServico;
@@ -59,7 +61,7 @@ public class SearchEnzymeBean implements Serializable {
 	public Boolean searchEnzymeInOrganism() throws ServletException, IOException {
 		organism = (String) request.getSession().getAttribute("organismSelected");
 		if (! buildGraph()) {
-			return false;
+			return false; // Nao existe essa enzima no 2Path
 		}
 		response.sendRedirect("#");
 		facesContext.responseComplete();
@@ -90,10 +92,12 @@ public class SearchEnzymeBean implements Serializable {
 				f.setWritable(true);
 				f.setReadable(true);
 				jsonFile = new PrintWriter(f);
+				
 				String jsonNeo4j = searchInOrganismServico.getJsonForEnzyme(organism, ec);
 				
-				if (!jsonNeo4j.isEmpty()) {
-					//jsonNeo4j = parseNeo4jResult(jsonNeo4j);
+				if (!jsonNeo4j.equals("[]")) {
+					jsonNeo4j = parseNeo4jResult(jsonNeo4j);
+					
 					jsonFile.write(jsonNeo4j);
 					jsonFile.write("");
 					jsonFile.close();
@@ -108,12 +112,87 @@ public class SearchEnzymeBean implements Serializable {
 		return false;
 	}
 	
-	/*private String parseNeo4jResult(String jsonNeo4j) {
-		String graph;
+	private String parseNeo4jResult(String jsonObj) {
+		String nodesD3 = "", linksD3 = "";
+		String name, propertie;
 		
+		try {
+			JSONArray data = new JSONArray(jsonObj);
+			JSONArray nodeGroup, relationshipGroup;
+			JSONObject graph, node, relationship;
+			graph = ((JSONObject) data.get(0)).getJSONObject("graph");
+			nodeGroup = graph.getJSONArray("nodes");
+			relationshipGroup = graph.getJSONArray("relationships");
+			
+			for (int j = 0; j < nodeGroup.length(); j++) {
+				node = ((JSONObject) nodeGroup.get(j));
+				name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
+				propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
+				
+				nodesD3 += "{\"id\":\"" + node.getString("id") +
+						"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name) +
+						"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie) +
+						"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
+			}
+			for (int j = 0; j < relationshipGroup.length(); j++) {
+				relationship = ((JSONObject) relationshipGroup.get(j));
+				linksD3 += "{\"source\":\"" + relationship.getString("startNode") +
+						"\", \"target\":\"" + relationship.getString("endNode") + 
+						"\", \"type\":\"" + relationship.getString("type") +"\"},";
+			}
+			
+		}
+		catch (JSONException e) {
+			System.out.println("unexpected JSON exception : " + e);
+		}
 		
-		return "";
-	}*/
+		return "{ \"nodes\": [ " + nodesD3.substring(0, nodesD3.length()-1) +
+				"], \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";
+	}
+	
+	private String getName(String label) {
+		String name = "";
+		switch (label) {
+			case "Organism":
+				name = "taxName";
+				break;
+			case "Compounds":
+				name = "compoundName";
+				break;
+			case "Enzymes":
+				name = "enzymeName";
+				break;
+			case "Reactions":
+				name = "reactionName";
+				break;
+			case "Sequences":
+				name = "ecNumber";
+				break;
+		}
+		return name;
+	}
+	
+	private String getPropertie (String label) {
+		String name = "";
+		switch (label) {
+			case "Organism":
+				name = "taxRefs";
+				break;
+			case "Compounds":
+				name = "keggID_compound";
+				break;
+			case "Enzymes":
+				name = "ecNumber";
+				break;
+			case "Reactions":
+				name = "keggID_Reaction";
+				break;
+			case "Sequences":
+				name = "seqFasta";
+				break;
+		}
+		return name;
+	}
 	
 	public String getEc() {
 		return ec;

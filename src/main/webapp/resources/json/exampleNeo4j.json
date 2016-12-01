@@ -1,0 +1,183 @@
+{
+  "results": [
+    {
+      "columns": [
+        "s",
+        "e"
+      ],
+      "data": [
+        {
+          "row": [
+            {
+              "taxId": "3702",
+              "ecNumber": "1.1.1.267",
+              "seqFasta": ">sp|Q9XFS9|DXR_ARATH 1-deoxy-D-xylulose 5-phosphate reductoisomerase, chloroplastic OS=Arabidopsis thaliana GN=DXR PE=2 SV=2\nMMTLNSLSPAESKAISFLDTSRFNPIPKLSGGFSLRRRNQGRGFGKGVKCSVKVQQQQQP\nPPAWPGRAVPEAPRQSWDGPKPISIVGSTGSIGTQTLDIVAENPDKFRVVALAAGSNVTL\nLADQVRRFKPALVAVRNESLINELKEALADLDYKLEIIPGEQGVIEVARHPEAVTVVTGI\nVGCAGLKPTVAAIEAGKDIALANKETLIAGGPFVLPLANKHNVKILPADSEHSAIFQCIQ\nGLPEGALRKIILTASGGAFRDWPVEKLKEVKVADALKHPNWNMGKKITVDSATLFNKGLE\nVIEAHYLFGAEYDDIEIVIHPQSIIHSMIETQDSSVLAQLGWPDMRLPILYTMSWPDRVP\nCSEVTWPRLDLCKLGSLTFKKPDNVKYPSMDLAYAAGRAGGTMTGVLSAANEKAVEMFID\nEKISYLDIFKVVELTCDKHRNELVTSPSLEEIVHYDLWAREYAANVQLSSGARPVHA"
+            },
+            {
+              "enzymeAlternativeName": " DXP-reductoisomerase",
+              "ecNumber": "1.1.1.267",
+              "enzymeName": " DXP-reductoisomerase"
+            }
+          ],
+          "meta": [
+            {
+              "id": 26488,
+              "type": "node",
+              "deleted": false
+            },
+            {
+              "id": 266,
+              "type": "node",
+              "deleted": false
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "26488",
+                "labels": [
+                  "Sequences"
+                ],
+                "properties": {
+                  "taxId": "3702",
+                  "ecNumber": "1.1.1.267",
+                  "seqFasta": ">sp|Q9XFS9|DXR_ARATH 1-deoxy-D-xylulose 5-phosphate reductoisomerase, chloroplastic OS=Arabidopsis thaliana GN=DXR PE=2 SV=2\nMMTLNSLSPAESKAISFLDTSRFNPIPKLSGGFSLRRRNQGRGFGKGVKCSVKVQQQQQP\nPPAWPGRAVPEAPRQSWDGPKPISIVGSTGSIGTQTLDIVAENPDKFRVVALAAGSNVTL\nLADQVRRFKPALVAVRNESLINELKEALADLDYKLEIIPGEQGVIEVARHPEAVTVVTGI\nVGCAGLKPTVAAIEAGKDIALANKETLIAGGPFVLPLANKHNVKILPADSEHSAIFQCIQ\nGLPEGALRKIILTASGGAFRDWPVEKLKEVKVADALKHPNWNMGKKITVDSATLFNKGLE\nVIEAHYLFGAEYDDIEIVIHPQSIIHSMIETQDSSVLAQLGWPDMRLPILYTMSWPDRVP\nCSEVTWPRLDLCKLGSLTFKKPDNVKYPSMDLAYAAGRAGGTMTGVLSAANEKAVEMFID\nEKISYLDIFKVVELTCDKHRNELVTSPSLEEIVHYDLWAREYAANVQLSSGARPVHA"
+                }
+              },
+              {
+                "id": "266",
+                "labels": [
+                  "Enzymes"
+                ],
+                "properties": {
+                  "enzymeAlternativeName": " DXP-reductoisomerase",
+                  "ecNumber": "1.1.1.267",
+                  "enzymeName": " DXP-reductoisomerase"
+                }
+              }
+            ],
+            "relationships": []
+          }
+        },
+        {
+          "row": [
+            {
+              "taxId": "3702",
+              "ecNumber": "2.7.7.60",
+              "seqFasta": ">sp|P69834|ISPD_ARATH 2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase, chloroplastic OS=Arabidopsis thaliana GN=ISPD PE=1 SV=1\nMAMLQTNLGFITSPTFLCPKLKVKLNSYLWFSYRSQVQKLDFSKRVNRSYKRDALLLSIK\nCSSSTGFDNSNVVVKEKSVSVILLAGGQGKRMKMSMPKQYIPLLGQPIALYSFFTFSRMP\nEVKEIVVVCDPFFRDIFEEYEESIDVDLRFAIPGKERQDSVYSGLQEIDVNSELVCIHDS\nARPLVNTEDVEKVLKDGSAVGAAVLGVPAKATIKEVNSDSLVVKTLDRKTLWEMQTPQVI\nKPELLKKGFELVKSEGLEVTDDVSIVEYLKHPVYVSQGSYTNIKVTTPDDLLLAERILSE\nDS"
+            },
+            {
+              "ecNumber": "2.7.7.60",
+              "enzymeName": "2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase; MEP cytidylyltransferase"
+            }
+          ],
+          "meta": [
+            {
+              "id": 26489,
+              "type": "node",
+              "deleted": false
+            },
+            {
+              "id": 3643,
+              "type": "node",
+              "deleted": false
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "26489",
+                "labels": [
+                  "Sequences"
+                ],
+                "properties": {
+                  "taxId": "3702",
+                  "ecNumber": "2.7.7.60",
+                  "seqFasta": ">sp|P69834|ISPD_ARATH 2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase, chloroplastic OS=Arabidopsis thaliana GN=ISPD PE=1 SV=1\nMAMLQTNLGFITSPTFLCPKLKVKLNSYLWFSYRSQVQKLDFSKRVNRSYKRDALLLSIK\nCSSSTGFDNSNVVVKEKSVSVILLAGGQGKRMKMSMPKQYIPLLGQPIALYSFFTFSRMP\nEVKEIVVVCDPFFRDIFEEYEESIDVDLRFAIPGKERQDSVYSGLQEIDVNSELVCIHDS\nARPLVNTEDVEKVLKDGSAVGAAVLGVPAKATIKEVNSDSLVVKTLDRKTLWEMQTPQVI\nKPELLKKGFELVKSEGLEVTDDVSIVEYLKHPVYVSQGSYTNIKVTTPDDLLLAERILSE\nDS"
+                }
+              },
+              {
+                "id": "3643",
+                "labels": [
+                  "Enzymes"
+                ],
+                "properties": {
+                  "ecNumber": "2.7.7.60",
+                  "enzymeName": "2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase; MEP cytidylyltransferase"
+                }
+              }
+            ],
+            "relationships": []
+          }
+        },
+        {
+          "row": [
+            {
+              "taxId": "3702",
+              "ecNumber": "2.7.1.148",
+              "seqFasta": ">sp|O81014|ISPE_ARATH 4-diphosphocytidyl-2-C-methyl-D-erythritol kinase, chloroplastic OS=Arabidopsis thaliana GN=ISPE PE=2 SV=1\nMATASPPFISTLSFTHSSFKTSSSSSFSPKLLRPLLSFSVKASRKQVEIVFDPDERLNKI\nGDDVDKEAPLSRLKLFSPCKINVFLRITGKREDGFHDLASLFHVISLGDTIKFSLSPSKS\nKDRLSTNVQGVPVDGRNLIIKALNLYRKKTGSNRFFWIHLDKKVPTGAGLGGGSSNAATA\nLWAANELNGGLVTENELQDWSSEIGSDIPFFFSHGAAYCTGRGEIVQDLPPPFPLDLPMV\nLIKPREACSTAEVYKRLRLDQTSNINPLTLLENVTSNGVSQSICVNDLEPPAFSVLPSLK\nRLKQRIIASGRGEYDAVFMSGSGSTIIGIGSPDPPQFIYDDEEYKNVFLSEANFMTREAN\nEWYKEPASANATTSSAESRMDFQ"
+            },
+            {
+              "ecNumber": "2.7.1.148",
+              "enzymeName": "4-(cytidine 5'-diphospho)-2-C-methyl-D-erythritol kinase; CDP-ME kinase"
+            }
+          ],
+          "meta": [
+            {
+              "id": 26490,
+              "type": "node",
+              "deleted": false
+            },
+            {
+              "id": 3453,
+              "type": "node",
+              "deleted": false
+            }
+          ],
+          "graph": {
+            "nodes": [
+              {
+                "id": "26490",
+                "labels": [
+                  "Sequences"
+                ],
+                "properties": {
+                  "taxId": "3702",
+                  "ecNumber": "2.7.1.148",
+                  "seqFasta": ">sp|O81014|ISPE_ARATH 4-diphosphocytidyl-2-C-methyl-D-erythritol kinase, chloroplastic OS=Arabidopsis thaliana GN=ISPE PE=2 SV=1\nMATASPPFISTLSFTHSSFKTSSSSSFSPKLLRPLLSFSVKASRKQVEIVFDPDERLNKI\nGDDVDKEAPLSRLKLFSPCKINVFLRITGKREDGFHDLASLFHVISLGDTIKFSLSPSKS\nKDRLSTNVQGVPVDGRNLIIKALNLYRKKTGSNRFFWIHLDKKVPTGAGLGGGSSNAATA\nLWAANELNGGLVTENELQDWSSEIGSDIPFFFSHGAAYCTGRGEIVQDLPPPFPLDLPMV\nLIKPREACSTAEVYKRLRLDQTSNINPLTLLENVTSNGVSQSICVNDLEPPAFSVLPSLK\nRLKQRIIASGRGEYDAVFMSGSGSTIIGIGSPDPPQFIYDDEEYKNVFLSEANFMTREAN\nEWYKEPASANATTSSAESRMDFQ"
+                }
+              },
+              {
+                "id": "3453",
+                "labels": [
+                  "Enzymes"
+                ],
+                "properties": {
+                  "ecNumber": "2.7.1.148",
+                  "enzymeName": "4-(cytidine 5'-diphospho)-2-C-methyl-D-erythritol kinase; CDP-ME kinase"
+                }
+              }
+            ],
+            "relationships": []
+          }
+        }
+      ],
+      "stats": {
+        "contains_updates": false,
+        "nodes_created": 0,
+        "nodes_deleted": 0,
+        "properties_set": 0,
+        "relationships_created": 0,
+        "relationship_deleted": 0,
+        "labels_added": 0,
+        "labels_removed": 0,
+        "indexes_added": 0,
+        "indexes_removed": 0,
+        "constraints_added": 0,
+        "constraints_removed": 0
+      }
+    }
+  ],
+  "errors": [],
+  "responseTime": 63
+}

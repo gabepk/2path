@@ -1,1 +1,16 @@
-{"nodes":[{"id":"26487","labels":["Organism"],"properties":{"taxId":"3702","taxName":"Arabidopsis thaliana","taxRefs":"Al-Shehbaz IA. 2009. Arabidopsis (de Candolle) Heynhold in F. Holl and G. Heynhold, Fl. Sachsen. 1: 538. 1842. [name conserved]. In Flora of North America Editorial Committee (Eds.) Flora of North America North of Mexico, Vol. 7: Magnoliophyta: Salicaceae to Brassicaceae. New York and Oxford."}},{"id":"26489","labels":["Sequences"],"properties":{"taxId":"3702","ecNumber":"2.7.7.60","seqFasta":">sp|P69834|ISPD_ARATH 2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase, chloroplastic OS=Arabidopsis thaliana GN=ISPD PE=1 SV=1\nMAMLQTNLGFITSPTFLCPKLKVKLNSYLWFSYRSQVQKLDFSKRVNRSYKRDALLLSIK\nCSSSTGFDNSNVVVKEKSVSVILLAGGQGKRMKMSMPKQYIPLLGQPIALYSFFTFSRMP\nEVKEIVVVCDPFFRDIFEEYEESIDVDLRFAIPGKERQDSVYSGLQEIDVNSELVCIHDS\nARPLVNTEDVEKVLKDGSAVGAAVLGVPAKATIKEVNSDSLVVKTLDRKTLWEMQTPQVI\nKPELLKKGFELVKSEGLEVTDDVSIVEYLKHPVYVSQGSYTNIKVTTPDDLLLAERILSE\nDS"}},{"id":"25418","labels":["Reactions"],"properties":{"reactionName":"CTP: 2-C-Methyl-D-erythritol 4-phosphate\n\t\t\tcytidylyltransferase","reactionDescription":" 2-C-Methyl-D-erythritol 4-phosphate + CTP\n\t\t\t<=> 4-(Cytidine 5'-diphospho)-2-C-methyl-D-erythritol +\n\t\t\tDiphosphate","keggID_Reaction":"R05633","keggLink_Reaction":"http://www.kegg.jp/dbget-bin/www_bget?rn:R05633","type":"irreversible"}},{"id":"3643","labels":["Enzymes"],"properties":{"ecNumber":"2.7.7.60","enzymeName":"2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase; MEP cytidylyltransferase"}}],"relationships":[{"id":"8081","startNode":"26487","properties":{},"type":"HAS","endNode":"26489"},{"id":"8078","startNode":"26489","properties":{},"type":"MATCHES","endNode":"3643"},{"id":"5503","startNode":"3643","properties":{},"type":"CATALYSE","endNode":"25418"}]}
+{ "nodes": 
+[ 
+
+{"id":"16304", "name":"1-Deoxy-D-xylulose 5-phosphate", "propertie":"C11437", "label":"Compounds", "group" = 1},
+{"id":"25417", "name":"1-Deoxy-D-xylulose-5-phosphate isomeroreductase", "propertie":"R05688", "label":"Reactions", "group" = 2},
+{"id":"25418", "name":"CTP: 2-C-Methyl-D-erythritol 4-phosphate cytidylyltransferase", "propertie":"R05633", "label":"Reactions", "group" = 2},{"id":"16301", "name":"2-C-Methyl-D-erythritol 4-phosphate", "propertie":"C11434", "label":"Compounds", "group" = 1},
+{"id":"16302", "name":"4-(Cytidine 5'-diphospho)-2-C-methyl-D-erythritol", "propertie":"C11435", "label":"Compounds", "group" = 1}
+], 
+
+"links": 
+[ {"source":"25417", "target":"16301", "type":"PRODUCTOF", "value": 1},
+{"source":"25418", "target":"16302", "type":"PRODUCTOF", "value": 1},
+{"source":"16304", "target":"25417", "type":"SUBSTRATE_FOR", "value": 2},
+{"source":"16301", "target":"25418", "type":"SUBSTRATE_FOR", "value": 2}
+]
+}
