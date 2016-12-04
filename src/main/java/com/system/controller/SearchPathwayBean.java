@@ -93,17 +93,13 @@ public class SearchPathwayBean implements Serializable {
 				
 				List<String> jsonNeo4j = searchInOrganismServico.getJsonForPathway(organism, substract, product);
 				
-				if (jsonNeo4j != null) {
-					String jsonAllData;
-					
-					jsonAllData = parseNeo4jResult(jsonNeo4j);
-					
-					jsonFile.write(jsonAllData);
-					jsonFile.write("");
-					jsonFile.close();
-					return true;
-				}
+				String jsonAllData;
+				jsonAllData = parseNeo4jResult(jsonNeo4j);
+				jsonFile.write(jsonAllData);
+				jsonFile.write("");
+				
 				jsonFile.close();
+				return jsonNeo4j != null ? true : false;
 			}
 		}
 		catch (IOException e) {
@@ -115,6 +111,9 @@ public class SearchPathwayBean implements Serializable {
 	private String parseNeo4jResult(List<String> jsonObj) {
 		String nodesD3 = "", linksD3 = "";
 		String name, propertie;
+		
+		if (jsonObj == null)
+			return "{\"links\": []}";
 		
 		try {
 			for (int i = 0; i < jsonObj.size(); i ++) {
@@ -130,14 +129,15 @@ public class SearchPathwayBean implements Serializable {
 					name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
 					propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
 					
-					nodesD3 += "{\"id\":\"" + node.getString("id") +
-							"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name) +
+					nodesD3 += "\n{\"id\":\"" + node.getString("id") +
+							"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name).replace('\n', ' ').replace('\t', ' ') +
 							"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie) +
 							"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
 				}
+				
 				for (int j = 0; j < relationshipGroup.length(); j++) {
 					relationship = ((JSONObject) relationshipGroup.get(j));
-					linksD3 += "{\"source\":\"" + relationship.getString("startNode") +
+					linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
 							"\", \"target\":\"" + relationship.getString("endNode") + 
 							"\", \"type\":\"" + relationship.getString("type") +"\"},";
 				}
@@ -148,8 +148,9 @@ public class SearchPathwayBean implements Serializable {
 			System.out.println("unexpected JSON exception : " + e);
 		}
 		
-		return "{ \"nodes\": [ " + nodesD3.substring(0, nodesD3.length()-1) +
-				"], \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";
+		/*return "{ \"nodes\": [ " + nodesD3.substring(0, nodesD3.length()-1) +
+				"],\n \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";*/
+		return "{ \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";
 	}
 	
 	private String getName(String label) {
