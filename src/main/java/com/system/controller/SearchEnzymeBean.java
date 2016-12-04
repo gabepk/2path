@@ -84,6 +84,10 @@ public class SearchEnzymeBean implements Serializable {
 		System.out.println("Organism: "+ organism);
 		System.out.println("Enzyme: "+ ec);
 		
+		String neo4jResponse = null;
+		if (ec != null) 
+			neo4jResponse = searchInOrganismServico.getJsonForEnzyme(organism, ec);
+		
 		try {
 			// Overwrites the file if it already exists
 			File f = new File(GRAPH_JSON_FILE_PATH);
@@ -92,17 +96,10 @@ public class SearchEnzymeBean implements Serializable {
 				f.setWritable(true);
 				f.setReadable(true);
 				jsonFile = new PrintWriter(f);
+				neo4jResponse = parseNeo4jResult(neo4jResponse);
 				
-				String jsonNeo4j = searchInOrganismServico.getJsonForEnzyme(organism, ec);
-				
-				if (!jsonNeo4j.equals("[]")) {
-					jsonNeo4j = parseNeo4jResult(jsonNeo4j);
-					
-					jsonFile.write(jsonNeo4j);
-					jsonFile.write("");
-					jsonFile.close();
-					return true;
-				}
+				jsonFile.write(neo4jResponse);
+				jsonFile.write("");
 				jsonFile.close();
 			}
 		}
@@ -115,6 +112,9 @@ public class SearchEnzymeBean implements Serializable {
 	private String parseNeo4jResult(String jsonObj) {
 		String nodesD3 = "", linksD3 = "";
 		String name, propertie;
+		
+		if (jsonObj.equals("[]"))
+			return "{\"links\": []}";
 		
 		try {
 			JSONArray data = new JSONArray(jsonObj);
@@ -129,14 +129,15 @@ public class SearchEnzymeBean implements Serializable {
 				name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
 				propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
 				
-				nodesD3 += "{\"id\":\"" + node.getString("id") +
-						"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name) +
+				nodesD3 += "\n{\"id\":\"" + node.getString("id") +
+						"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name).replace('\n', ' ').replace('\t', ' ') +
 						"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie) +
 						"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
 			}
+			
 			for (int j = 0; j < relationshipGroup.length(); j++) {
 				relationship = ((JSONObject) relationshipGroup.get(j));
-				linksD3 += "{\"source\":\"" + relationship.getString("startNode") +
+				linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
 						"\", \"target\":\"" + relationship.getString("endNode") + 
 						"\", \"type\":\"" + relationship.getString("type") +"\"},";
 			}
@@ -147,7 +148,8 @@ public class SearchEnzymeBean implements Serializable {
 		}
 		
 		return "{ \"nodes\": [ " + nodesD3.substring(0, nodesD3.length()-1) +
-				"], \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";
+			"],\n \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";
+		/*return "{ \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";*/
 	}
 	
 	private String getName(String label) {

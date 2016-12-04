@@ -1,9 +1,7 @@
-{ "links": [ 
-{"source":"16316", "target":"25421", "type":"SUBSTRATE_FOR"},
-{"source":"25418", "target":"16302", "type":"PRODUCTOF"},
-{"source":"25419", "target":"16303", "type":"PRODUCTOF"},
-{"source":"25420", "target":"16316", "type":"PRODUCTOF"},
-{"source":"25421", "target":"16653", "type":"PRODUCTOF"},
-{"source":"16301", "target":"25418", "type":"SUBSTRATE_FOR"},
-{"source":"16302", "target":"25419", "type":"SUBSTRATE_FOR"},
-{"source":"16303", "target":"25420", "type":"SUBSTRATE_FOR"}]}
+{ "nodes": [ 
+{"id":"16304", "name":"1-Deoxy-D-xylulose 5-phosphate", "propertie":"C11437", "label":"Compounds"},
+{"id":"25417", "name":"1-Deoxy-D-xylulose-5-phosphate isomeroreductase   ", "propertie":"R05688", "label":"Reactions"},
+{"id":"16301", "name":"2-C-Methyl-D-erythritol 4-phosphate", "propertie":"C11434", "label":"Compounds"}],
+ "links": [ 
+{"source":"25417", "target":"16301", "type":"PRODUCTOF"},
+{"source":"16304", "target":"25417", "type":"SUBSTRATE_FOR"}]}

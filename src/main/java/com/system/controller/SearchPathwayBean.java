@@ -50,6 +50,7 @@ public class SearchPathwayBean implements Serializable {
 	
 	public void preRender() {
 		compounds = searchInOrganismServico.getAllCompounds();
+		buildGraph();
 	}
 	
 	public SearchPathwayBean() {
@@ -82,6 +83,10 @@ public class SearchPathwayBean implements Serializable {
 		System.out.println("Substract: "+ substract);
 		System.out.println("Product: "+ product);
 		
+		List<String> neo4jResponse = null;
+		if (substract != null && product != null) 
+			neo4jResponse = searchInOrganismServico.getJsonForPathway(organism, substract, product);
+		
 		try {
 			// Overwrites the file if it already exists
 			File f = new File(GRAPH_JSON_FILE_PATH);
@@ -91,15 +96,13 @@ public class SearchPathwayBean implements Serializable {
 				f.setReadable(true);
 				jsonFile = new PrintWriter(f);
 				
-				List<String> jsonNeo4j = searchInOrganismServico.getJsonForPathway(organism, substract, product);
-				
-				String jsonAllData;
-				jsonAllData = parseNeo4jResult(jsonNeo4j);
-				jsonFile.write(jsonAllData);
+				String allData;
+				allData = parseNeo4jResult(neo4jResponse);
+				jsonFile.write(allData);
 				jsonFile.write("");
 				
 				jsonFile.close();
-				return jsonNeo4j != null ? true : false;
+				return neo4jResponse != null ? true : false;
 			}
 		}
 		catch (IOException e) {
@@ -148,9 +151,9 @@ public class SearchPathwayBean implements Serializable {
 			System.out.println("unexpected JSON exception : " + e);
 		}
 		
-		/*return "{ \"nodes\": [ " + nodesD3.substring(0, nodesD3.length()-1) +
-				"],\n \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";*/
-		return "{ \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";
+		return "{ \"nodes\": [ " + nodesD3.substring(0, nodesD3.length()-1) +
+				"],\n \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";
+		/*return "{ \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";*/
 	}
 	
 	private String getName(String label) {
