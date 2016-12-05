@@ -116,12 +116,12 @@ public class Organisms implements Serializable {
 		String query, payload;
 		
 		if (organism.isEmpty()) {
-			query = "MATCH (e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]->(r:Reactions)-[]-(co:Compounds) RETURN e, c, r, co";
+			query = "MATCH (e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]->(r:Reactions)-[l:PRODUCTOF]->(p:Compounds) RETURN e, c, r, l, p";
 		}
 		else {
 			query = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
-					"-[h:HAS]->(s:Sequences)-[m:MATCHES]->(e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]->(r:Reactions)" + 
-					"-[]-(co:Compounds) RETURN o, s, e, r, h, m, c, co";
+					"-[h:HAS]->(s:Sequences)-[m:MATCHES]->(e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]" + 
+					"->(r:Reactions) RETURN o, s, e, r, h, m, c";
 		}
 		payload = "{\"statements\" : [ {\"statement\" : \"" + query + "\", \"parameters\": null," +
 				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
@@ -186,7 +186,7 @@ public class Organisms implements Serializable {
 		return two_datas;
 	}
 	
-	public Boolean getPathwayInOrganism (String organism, String component_1, String component_2) {
+	/*public Boolean getPathwayInOrganism (String organism, String component_1, String component_2) {
 		List<String> Matched_reactions_ids = new ArrayList<>();
 		JSONObject jsonObj, graph, node;
 		JSONArray results, data, meta, nodeGroup;
@@ -248,7 +248,7 @@ public class Organisms implements Serializable {
 		}
 		
 		return true;
-	}
+	}*/
 	
 	private static String sendTransactionalCypherQuery(String payload) {
 		final String txUri = SERVER_ROOT_URI + "transaction/commit";

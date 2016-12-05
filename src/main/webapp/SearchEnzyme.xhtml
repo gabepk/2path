@@ -57,18 +57,6 @@
 						  stroke-width: 1.5px;
 						}
 						
-						#licensing {
-						  fill: green;
-						}
-						
-						.link.licensing {
-						  stroke: green;
-						}
-						
-						.link.resolved {
-						  stroke-dasharray: 0,2 1;
-						}
-						
 						circle {
 						  fill: #ccc;
 						  stroke: #333;
@@ -81,36 +69,30 @@
 						  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
 						}
 					</style>
-					<svg id="graphView"></svg>
-					<script src="http://d3js.org/d3.v2.min.js?2.9.3"></script>
+					<svg class="graphView"></svg>
+					<script src="https://d3js.org/d3.v4.min.js"></script>
 					<script>
 						var width = 960, height = 500;
 						
-						var svg = d3.select("svg")
+						var svg = d3.select("svg").attr("class", "graphView")
 							.attr("width", width).attr("height", height);
 						
-						var color = d3.scale.category20b();
+						var color = d3.scaleOrdinal(d3.schemeCategory20);
 						
-						var force = d3.layout.force()
-							    .gravity(.05)
-							    .linkDistance(150)
-							    .charge(-900)
-							    .size([width, height]);
-						
-						var nodes = {};
+						var simulation = d3.forceSimulation()
+					   	 .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(200).strength(1))
+					   	 .force("charge", d3.forceManyBody())
+					   	 .force("center", d3.forceCenter(width / 2, height / 2));
 						
 						d3.json("resources/json/graph.json", function(graph) {
-						         
-						     graph.links.forEach(function(link) {
-							    link.source = nodes[link.source] || (nodes[link.source] = {name : link.source, type : link.type});
-								link.target = nodes[link.target] || (nodes[link.target] = {name : link.target, type : link.type});
-							 });
-						  
-				             force.links(graph.links)
-				          		.nodes(d3.values(graph.nodes))
-								.on("tick", tick)
-								.start();
-									 
+							
+							  simulation
+							      .nodes(graph.nodes)
+							      .on("tick", tick);
+
+							  simulation.force("link")
+							      .links(graph.links);
+							  
 				             svg.append("defs").selectAll("marker").data(
 									[ "CATALYSE", "HAS", "MATCHES",
 									  "SUBSTRATE_FOR", "PRODUCTOF"]).enter()
@@ -122,23 +104,31 @@
 											15).attr("orient", "auto").append(
 											"path").attr("d", "M0,-2L5,0L0,02");
 						  
-				              var path = svg.append("g").selectAll("path").data(
-									force.links()).enter().append("path").attr(
-									"class", function(d) {
-										return "link " + d.type;
-									}).attr("marker-end", function(d) {
-								return "url(#" + d.type + ")";
-							  });
+				              var path = svg.append("g")
+				              			.selectAll("path")
+				              			.data(graph.links)
+				            		  	.enter()
+				            		  	.append("path")
+				            		  	.attr("class", function(d) {
+											return "link " + d.type;
+										})
+										.attr("marker-end", function(d) {
+											return "url(#" + d.type + ")";
+							  			});
 				          
-					          var circle = svg.append("g").selectAll("circle")
-					          				  .data(force.nodes())
+					          var circle = svg.append("g")
+					          				  .selectAll("circle")
+					          				  .data(graph.nodes)
 					          				  .enter()
 					          				  .append("circle")
 					          				  .attr("r", 22)
-											  .style("fill", color(function(d){return d.type}))
-											  .call(force.drag);
+											  .style("fill", function(d) { return color(d.label); })
+											  .call(d3.drag()
+											          .on("start", dragstarted)
+											          .on("drag", dragged)
+											          .on("end", dragended));
 					          var text = svg.append("g").selectAll("text")
-					          				  .data(force.nodes())
+					          				  .data(graph.nodes)
 					          				  .enter()
 					          				  .append("text")
 					          				  .attr("x", 8)
@@ -152,7 +142,7 @@
 					        	  path.attr("d", linkArc);
 					        	  circle.attr("transform", transform);
 					        	  text.attr("transform", transform);
-					        	}
+					          }
 					          
 					          function linkArc(d) {
 					        	  var dx = d.target.x - d.source.x,
@@ -161,11 +151,29 @@
 					        	  return "M" + d.source.x + "," + d.source.y + 
 					        	  		"A" + dr + "," + dr + " 0 0,1 " + 
 					        	  		d.target.x + "," + d.target.y;
-					        	}
+					          }
 					          
 					          function transform(d) {
 					        	  return "translate(" + d.x + "," + d.y + ")";
+					          }
+					          
+					          function dragstarted(d) {
+					        	  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+					        	  d.fx = d.x;
+					        	  d.fy = d.y;
 					        	}
+
+					        	function dragged(d) {
+					        	  d.fx = d3.event.x;
+					        	  d.fy = d3.event.y;
+					        	}
+
+					        	function dragended(d) {
+					        	  if (!d3.event.active) simulation.alphaTarget(0);
+					        	  d.fx = null;
+					        	  d.fy = null;
+					        	}
+					          
 						});
 					</script>
 				</div>

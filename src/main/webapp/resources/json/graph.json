@@ -1,7 +1,7 @@
 { "nodes": [ 
-{"id":"16304", "name":"1-Deoxy-D-xylulose 5-phosphate", "propertie":"C11437", "label":"Compounds"},
-{"id":"25417", "name":"1-Deoxy-D-xylulose-5-phosphate isomeroreductase   ", "propertie":"R05688", "label":"Reactions"},
-{"id":"16301", "name":"2-C-Methyl-D-erythritol 4-phosphate", "propertie":"C11434", "label":"Compounds"}],
+{"id":"25418", "name":"CTP: 2-C-Methyl-D-erythritol 4-phosphate    cytidylyltransferase", "propertie":"R05633", "label":"Reactions"},
+{"id":"3643", "name":"2.7.7.60", "propertie":"2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase; MEP cytidylyltransferase", "label":"Enzymes"},
+{"id":"16302", "name":"4-(Cytidine 5'-diphospho)-2-C-methyl-D-erythritol", "propertie":"C11435", "label":"Compounds"}],
  "links": [ 
-{"source":"25417", "target":"16301", "type":"PRODUCTOF"},
-{"source":"16304", "target":"25417", "type":"SUBSTRATE_FOR"}]}
+{"source":"25418", "target":"16302", "type":"PRODUCTOF"},
+{"source":"3643", "target":"25418", "type":"CATALYSE"}]}

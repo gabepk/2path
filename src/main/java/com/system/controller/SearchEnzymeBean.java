@@ -53,6 +53,7 @@ public class SearchEnzymeBean implements Serializable {
 	
 	public void preRender() {
 		enzymes = searchInOrganismServico.getAllEnzymes();
+		buildGraph();
 	}
 	
 	public SearchEnzymeBean() {
@@ -113,8 +114,9 @@ public class SearchEnzymeBean implements Serializable {
 		String nodesD3 = "", linksD3 = "";
 		String name, propertie;
 		
-		if (jsonObj.equals("[]"))
-			return "{\"links\": []}";
+		// Se procura-se enzima sem organismo ou resultado retornou string vazia
+		if ((jsonObj == null) || (jsonObj.equals("[]")))
+			return "{ \"nodes\": [], \"links\": [] }";
 		
 		try {
 			JSONArray data = new JSONArray(jsonObj);
@@ -131,7 +133,7 @@ public class SearchEnzymeBean implements Serializable {
 				
 				nodesD3 += "\n{\"id\":\"" + node.getString("id") +
 						"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name).replace('\n', ' ').replace('\t', ' ') +
-						"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie) +
+						"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie).replace('\n', ' ').replace('\t', ' ') +
 						"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
 			}
 			
@@ -149,7 +151,6 @@ public class SearchEnzymeBean implements Serializable {
 		
 		return "{ \"nodes\": [ " + nodesD3.substring(0, nodesD3.length()-1) +
 			"],\n \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";
-		/*return "{ \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";*/
 	}
 	
 	private String getName(String label) {
@@ -162,7 +163,7 @@ public class SearchEnzymeBean implements Serializable {
 				name = "compoundName";
 				break;
 			case "Enzymes":
-				name = "enzymeName";
+				name = "ecNumber";
 				break;
 			case "Reactions":
 				name = "reactionName";
@@ -184,7 +185,7 @@ public class SearchEnzymeBean implements Serializable {
 				name = "keggID_compound";
 				break;
 			case "Enzymes":
-				name = "ecNumber";
+				name = "enzymeName";
 				break;
 			case "Reactions":
 				name = "keggID_Reaction";

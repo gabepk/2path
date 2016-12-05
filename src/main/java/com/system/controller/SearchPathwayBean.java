@@ -115,8 +115,9 @@ public class SearchPathwayBean implements Serializable {
 		String nodesD3 = "", linksD3 = "";
 		String name, propertie;
 		
+		// Se procura-se caminho sem organismo ou resultado retornou lista vazia
 		if (jsonObj == null)
-			return "{\"links\": []}";
+			return "{ \"nodes\": [], \"links\": [] }";
 		
 		try {
 			for (int i = 0; i < jsonObj.size(); i ++) {
@@ -134,7 +135,7 @@ public class SearchPathwayBean implements Serializable {
 					
 					nodesD3 += "\n{\"id\":\"" + node.getString("id") +
 							"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name).replace('\n', ' ').replace('\t', ' ') +
-							"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie) +
+							"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie).replace('\n', ' ').replace('\t', ' ') +
 							"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
 				}
 				
@@ -153,7 +154,6 @@ public class SearchPathwayBean implements Serializable {
 		
 		return "{ \"nodes\": [ " + nodesD3.substring(0, nodesD3.length()-1) +
 				"],\n \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";
-		/*return "{ \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";*/
 	}
 	
 	private String getName(String label) {
@@ -166,7 +166,7 @@ public class SearchPathwayBean implements Serializable {
 				name = "compoundName";
 				break;
 			case "Enzymes":
-				name = "enzymeName";
+				name = "ecNumber";
 				break;
 			case "Reactions":
 				name = "reactionName";
@@ -188,7 +188,7 @@ public class SearchPathwayBean implements Serializable {
 				name = "keggID_compound";
 				break;
 			case "Enzymes":
-				name = "ecNumber";
+				name = "enzymeName";
 				break;
 			case "Reactions":
 				name = "keggID_Reaction";
