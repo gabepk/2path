@@ -52,7 +52,6 @@ public class SearchPathwayBean implements Serializable {
 	
 	public void preRender() {
 		compounds = searchInOrganismServico.getAllCompounds();
-		buildGraph();
 	}
 	
 	public SearchPathwayBean() {
@@ -62,9 +61,9 @@ public class SearchPathwayBean implements Serializable {
 		organism = (String) request.getSession().getAttribute("organismSelected");
 		String resultValue = "";
 		String resultStyle = "";
+		String json = buildGraph();
 		
-		// TODO: Trocar por query que soh verifica se existe
-		if (buildGraph().isEmpty()) {
+		if (json.replaceAll("\\s+","").equals("{\"nodes\":[],\"links\":[]}")) {
 			resultStyle = "font-size:18px;color:red";
 			resultValue = (organism.isEmpty()) ? "Pathway not found" : "Pathway not found in organism " + organism;
 		}
@@ -75,6 +74,14 @@ public class SearchPathwayBean implements Serializable {
 				
 		result.setStyle(resultStyle);
 		result.setValue(resultValue);
+		
+		try {
+			JSONObject jsonGraph;
+			jsonGraph = new JSONObject(json);
+			request.getSession().setAttribute("jsonGraph", jsonGraph);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public List<String> suggestKeywords(String consulta) {
@@ -96,35 +103,16 @@ public class SearchPathwayBean implements Serializable {
 		List<String> neo4jResponse = null;
 		if (substract != null && product != null) 
 			neo4jResponse = searchInOrganismServico.getJsonForPathway(organism, substract, product);
-		
-		try {
-			// Overwrites the file if it already exists
-			File f = new File(GRAPH_JSON_FILE_PATH);
-			PrintWriter jsonFile = null;
-			if (f.exists()) {
-				f.setWritable(true);
-				f.setReadable(true);
-				jsonFile = new PrintWriter(f);
-				
-				String allData;
-				allData = parseNeo4jResult(neo4jResponse);
-				jsonFile.write(allData);
-				jsonFile.write("");
-				
-				
-				System.out.println("JSON: \n" + jsonFile);
-				jsonFile.flush();
-				jsonFile.close();
-				return allData
-						.replaceAll("\\s+","")
-						.equals("{\"nodes\":[],\"links\":[]}") 
-						? "" : allData; // Retorna falso se grafo eh vazio
-			}
-		}
-		catch (IOException e) {
-			System.out.println("unexpected IO issue: " + e);
-		}
-		return "";
+
+		String allData;
+		allData = parseNeo4jResult(neo4jResponse);
+
+		return allData
+				.replaceAll("\\s+","")
+				.equals("{\"nodes\":[],\"links\":[]}") 
+				? "{\"nodes\":[],\"links\":[]}" 
+				: allData;
+
 	}
 	
 	private String parseNeo4jResult(List<String> jsonObj) {

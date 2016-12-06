@@ -1,12 +1,1 @@
-{ "nodes": [ 
-{"id":"25418", "name":"CTP: 2-C-Methyl-D-erythritol 4-phosphatecytidylyltransferase", "propertie":"R05633", "label":"Reactions"},
-{"id":"3643", "name":"2.7.7.60", "propertie":"2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase; MEP cytidylyltransferase", "label":"Enzymes"},
-{"id":"16302", "name":"4-(Cytidine 5'-diphospho)-2-C-methyl-D-erythritol", "propertie":"C11435", "label":"Compounds"},
-{"id":"16301", "name":"2-C-Methyl-D-erythritol 4-phosphate", "propertie":"C11434", "label":"Compounds"},
-{"id":"26487", "name":"Arabidopsis thaliana", "propertie":"Al-Shehbaz IA. 2009. Arabidopsis (de Candolle) Heynhold in F. Holl and G. Heynhold, Fl. Sachsen. 1: 538. 1842. [name conserved]. In Flora of North America Editorial Committee (Eds.) Flora of North America North of Mexico, Vol. 7: Magnoliophyta: Salicaceae to Brassicaceae. New York and Oxford.", "label":"Organism"},
-{"id":"26489", "name":"2.7.7.60", "propertie":">sp|P69834|ISPD_ARATH 2-C-methyl-D-erythritol 4-phosphate cytidylyltransferase, chloroplastic OS=Arabidopsis thaliana GN=ISPD PE=1 SV=1MAMLQTNLGFITSPTFLCPKLKVKLNSYLWFSYRSQVQKLDFSKRVNRSYKRDALLLSIKCSSSTGFDNSNVVVKEKSVSVILLAGGQGKRMKMSMPKQYIPLLGQPIALYSFFTFSRMPEVKEIVVVCDPFFRDIFEEYEESIDVDLRFAIPGKERQDSVYSGLQEIDVNSELVCIHDSARPLVNTEDVEKVLKDGSAVGAAVLGVPAKATIKEVNSDSLVVKTLDRKTLWEMQTPQVIKPELLKKGFELVKSEGLEVTDDVSIVEYLKHPVYVSQGSYTNIKVTTPDDLLLAERILSEDS", "label":"Sequences"}], "links": [ 
-{"source":"25418", "target":"16302", "type":"PRODUCTOF"},
-{"source":"3643", "target":"25418", "type":"CATALYSE"},
-{"source":"16301", "target":"25418", "type":"SUBSTRATE_FOR"},
-{"source":"26487", "target":"26489", "type":"HAS"},
-{"source":"26489", "target":"3643", "type":"MATCHES"}]}
+{ "nodes": [], "links": [] }
