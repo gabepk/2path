@@ -110,44 +110,79 @@ public class Organisms implements Serializable {
 		return allEnzymes;
 	}
 	
-	public String getJsonForEnzyme(String organism, String ec) {
+	public List<String> getJsonForEnzyme(String organism, String ec) {
 		JSONObject jsonObj;
 		JSONArray results, data;
-		String query, payload;
+		String query_1, query_2, query_3;
+		String payload_1, payload_2, payload_3;
+		List<String> data_set = new ArrayList<>();
 		
-		if (organism.isEmpty()) {
-			query = "MATCH (e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]->(r:Reactions)-[l:PRODUCTOF]->(p:Compounds) RETURN e, c, r, l, p";
-		}
-		else {
-			query = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
-					"-[h:HAS]->(s:Sequences)-[m:MATCHES]->(e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]" + 
-					"->(r:Reactions) RETURN o, s, e, r, h, m, c";
-		}
-		payload = "{\"statements\" : [ {\"statement\" : \"" + query + "\", \"parameters\": null," +
+		query_1 = "MATCH (e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]->(r:Reactions)" +
+					"-[p:PRODUCTOF]->(co:Compounds) RETURN e, c, r, p, co";
+		payload_1 = "{\"statements\" : [ {\"statement\" : \"" + query_1 + "\", \"parameters\": null," +
 				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
-		String responseNeo4j = sendTransactionalCypherQuery(payload);
+		String enzyme_to_substract = sendTransactionalCypherQuery(payload_1);
+		
+		
+		query_2 = "MATCH (Enzymes{ecNumber:\\\"" + ec + "\\\"})-[CATALYSE]->(Reactions)" +
+				"<-[s:SUBSTRATE_FOR]-(co:Compounds) RETURN s, co";
+		payload_2 = "{\"statements\" : [ {\"statement\" : \"" + query_2 + "\", \"parameters\": null," +
+				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
+		String enzyme_to_product = sendTransactionalCypherQuery(payload_2);
 		
 		try {
-			jsonObj = new JSONObject(responseNeo4j);
+			jsonObj = new JSONObject(enzyme_to_substract);
 			results = jsonObj.getJSONArray("results");
 			data = ((JSONObject) results.get(0)).getJSONArray("data");
+			data_set.add(data.toString());
+			
+			jsonObj = new JSONObject(enzyme_to_product);
+			results = jsonObj.getJSONArray("results");
+			data = ((JSONObject) results.get(0)).getJSONArray("data");
+			data_set.add(data.toString());
+			
+			if (data_set.size() == 0) return null; // Enzima nao catalisa nenhuma reacao com substrato e produto
+
+			
+			if (organism != null && !organism.isEmpty()) {
+				/*
+				 * Caminho entre organismo e reacoes (que fazem parte caminho que liga os dois compostos)
+				 */
+				query_3 = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
+						"-[h:HAS]->(s:Sequences)-[m:MATCHES]->(Enzymes{ecNumber:\\\"" + ec + "\\\"})" + 
+						" RETURN o, h, s, m";
+				payload_3 = "{\"statements\" : [ {\"statement\" : \"" + query_3 + "\", \"parameters\": null," +
+						"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
+				String organism_to_enzymes = sendTransactionalCypherQuery(payload_3);
+				
+				jsonObj = new JSONObject(organism_to_enzymes);
+				results = jsonObj.getJSONArray("results");
+				data = ((JSONObject) results.get(0)).getJSONArray("data");
+				
+				// Se pediu para encontrar no organismo, mas nao tem, entao nao existe
+				if ( ! data.isNull(0)) data_set.add(data.toString());
+				else data_set.clear();
+			}
 		}
 		catch (JSONException e) {
 			System.out.println("unexpected JSON exception : " + e);
-			return "";
+			return null;
 		}
 		
-		return data.toString();
+		return data_set;
 	}
 	
 	public List<String> getJsonForPathway(String organism, String substract, String product) {
 		JSONObject jsonObj;
 		JSONArray results, data;
 		String query_1, query_2, payload;
-		List<String> two_datas = new ArrayList<>();
+		List<String> data_set = new ArrayList<>();
 		
-		query_1 = "MATCH (c1:Compounds{compoundName:\\\""+ 
-				substract +"\\\"})-[r2*]->(c2:Compounds{compoundName:\\\""+ product +"\\\"}) " +
+		/*
+		 * Caminho entre dois compostos e as reacoes entre eles
+		 */
+		query_1 = "MATCH (c1:Compounds{compoundName:\\\"" + substract
+				 +"\\\"})-[r2*]->(c2:Compounds{compoundName:\\\""+ product +"\\\"}) " +
 				"RETURN c1, r2, c2";
 		payload = "{\"statements\" : [ {\"statement\" : \"" + query_1 + "\", \"parameters\": null," +
 				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
@@ -161,21 +196,23 @@ public class Organisms implements Serializable {
 			
 			if (data.isNull(0)) return null; // Nao existe caminho entre eles
 			
-			two_datas.add(data.toString());
+			data_set.add(data.toString());
 			
-			if (!organism.isEmpty()) {
+			if (organism != null && !organism.isEmpty()) {
+				/*
+				 * Caminho entre organismo e reacoes (que fazem parte caminho que liga os dois compostos)
+				 */
 				query_2 = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
-					    "-[h:HAS]->(s:Sequences)-[m:MATCHES]->(e:Enzymes)-[c:CATALYSE]->(r:Reactions) "+
-						"RETURN o, h, s, m, e, c, r, co";
-				payload = "{\"statements\" : [ {\"statement\" : \"" + query_1 + "\", \"parameters\": null," +
+					    "-[h:HAS]->(s:Sequences)-[m:MATCHES]->(e:Enzymes)-[c:CATALYSE]->(:Reactions) "+
+						"RETURN o, h, s, m, e, c";
+				payload = "{\"statements\" : [ {\"statement\" : \"" + query_2 + "\", \"parameters\": null," +
 						"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
 				String organism_to_reactions = sendTransactionalCypherQuery(payload);
 				
-				jsonObj = new JSONObject(path_between_components);
+				jsonObj = new JSONObject(organism_to_reactions);
 				results = jsonObj.getJSONArray("results");
 				data = ((JSONObject) results.get(0)).getJSONArray("data");
-				two_datas.add(data.toString());
-				
+				data_set.add(data.toString());
 			}
 		}
 		catch (JSONException e) {
@@ -183,89 +220,21 @@ public class Organisms implements Serializable {
 			return null;
 		}
 		
-		return two_datas;
+		return data_set;
 	}
 	
-	/*public Boolean getPathwayInOrganism (String organism, String component_1, String component_2) {
-		List<String> Matched_reactions_ids = new ArrayList<>();
-		JSONObject jsonObj, graph, node;
-		JSONArray results, data, meta, nodeGroup;
-		String query, payload;
-		// Organismo ate reacoes
-		query = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
-				"-[:HAS]->(s:Sequences)-[:MATCHES]->(e:Enzymes)-[:CATALYSE]->(r1:Reactions) RETURN r1";
-		payload = "{\"statements\" : [ {\"statement\" : \"" + query + "\", \"parameters\": null," +
-				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
-		String organism_to_reactions = sendTransactionalCypherQuery(payload);
-		
-		// Caminho entre dois compostos
-		query = "MATCH (c1:Compounds{compoundName:\\\""+ 
-				component_1 +"\\\"})-[r2*]->(c2:Compounds{compoundName:\\\""+ component_2 +"\\\"}) RETURN r2";
-		payload = "{\"statements\" : [ {\"statement\" : \"" + query + "\", \"parameters\": null," +
-				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
-		String path_between_components = sendTransactionalCypherQuery(payload);
-				
-		try {
-			// Adiciona em Matched_reactions_ids as 
-			// reacoes que sao catalizadas por enzimas 
-			// cuja sequencia foi encontrada no organismo
-			
-			jsonObj = new JSONObject(organism_to_reactions);
-			results = jsonObj.getJSONArray("results");
-			
-			data = ((JSONObject) results.get(0)).getJSONArray("data");
-			
-			for (int i = 0; i < data.length(); i++) {
-				meta = ((JSONObject) data.get(i)).getJSONArray("meta");
-				
-				Matched_reactions_ids.add(((JSONObject) meta.get(0)).get("id").toString());
-			}
-			
-			// Verifica se todas as reações do caminho
-			// entre os compostos estao em Matched_reactions_ids
-			
-			jsonObj = new JSONObject(path_between_components);
-			results = jsonObj.getJSONArray("results");
-			
-			data = ((JSONObject) results.get(0)).getJSONArray("data");
-			graph = ((JSONObject) data.get(0)).getJSONObject("graph");
-			nodeGroup = graph.getJSONArray("nodes");
-			
-			for (int i = 0; i < nodeGroup.length(); i++) {
-				node = ((JSONObject) nodeGroup.get(i));
-				
-				if ( ((String) (node.getJSONArray("labels")).get(0)) . equals("Reactions") ) {
-					if ( !Matched_reactions_ids.contains(node.get("id").toString()) ) {
-						return false;
-					}
-				}
-			}
-			
-		}
-		catch (JSONException e) {
-			System.out.println("unexpected JSON exception : " + e);
-			return false;
-		}
-		
-		return true;
-	}*/
 	
 	private static String sendTransactionalCypherQuery(String payload) {
 		final String txUri = SERVER_ROOT_URI + "transaction/commit";
 		WebResource resource = Client.create().resource(txUri);
 		resource.addFilter(new HTTPBasicAuthFilter("neo4j","213546")); 
-		//String payload = "{\"statements\" : [ {\"statement\" : \"" + query
-		//		+ "\"} ]}";
+		
 		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON)
 				.type(MediaType.APPLICATION_JSON).entity(payload)
 				.get(ClientResponse.class);
 		
 		// TODO: Usar a resposta para verificar se deu 200 Ok
 
-		/*System.out.println(String.format(
-				" POST \n [%s] \n to \n [%s] \n status code [%d], returned data: \n "
-						+ System.lineSeparator() + "%s", payload, txUri,
-				response.getStatus(), response.getEntity(String.class)));*/
 		String responseJson = response.getEntity(String.class);
 		response.close();
 		return responseJson;

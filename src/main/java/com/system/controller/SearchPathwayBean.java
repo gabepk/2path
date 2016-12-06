@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,7 +21,6 @@ import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
 import org.primefaces.json.JSONObject;
 
-import com.system.model.Organism;
 import com.system.service.SearchInOrganismServico;
 
 @Named
@@ -46,6 +46,8 @@ public class SearchPathwayBean implements Serializable {
 	
 	private String organism, substract, product;
 	
+	private HtmlOutputText result;
+	
 	public static List<String> compounds = new ArrayList<>();
 	
 	public void preRender() {
@@ -56,15 +58,23 @@ public class SearchPathwayBean implements Serializable {
 	public SearchPathwayBean() {
 	}
 	
-	public Boolean searchPathwayInOrganism() throws ServletException, IOException {
+	public void searchPathwayInOrganism() throws ServletException, IOException {
 		organism = (String) request.getSession().getAttribute("organismSelected");
-		if (! buildGraph()) {
-			return false; // Nao existe essa caminho no 2Path
-		}
-		response.sendRedirect("#");
-		facesContext.responseComplete();
+		String resultValue = "";
+		String resultStyle = "";
 		
-		return true;
+		// TODO: Trocar por query que soh verifica se existe
+		if (buildGraph() == false) {
+			resultStyle = "font-size:18px;color:red";
+			resultValue = (organism.isEmpty()) ? "Pathway not found" : "Pathway not found in organism " + organism;
+		}
+		else {
+			resultStyle = "font-size:18px;color:green";
+			resultValue = (organism.isEmpty()) ? "Pathway found" : "Pathway found in organism " + organism;
+		}
+				
+		result.setStyle(resultStyle);
+		result.setValue(resultValue);
 	}
 
 	public List<String> suggestKeywords(String consulta) {
@@ -101,8 +111,14 @@ public class SearchPathwayBean implements Serializable {
 				jsonFile.write(allData);
 				jsonFile.write("");
 				
+				
+				System.out.println("JSON: \n" + jsonFile);
+				jsonFile.flush();
 				jsonFile.close();
-				return neo4jResponse != null ? true : false;
+				return allData
+						.replaceAll("\\s+","")
+						.equals("{\"nodes\":[],\"links\":[]}") 
+						? false : true; // Retorna falso se grafo eh vazio
 			}
 		}
 		catch (IOException e) {
@@ -124,26 +140,31 @@ public class SearchPathwayBean implements Serializable {
 				JSONArray data = new JSONArray(jsonObj.get(i));
 				JSONArray nodeGroup, relationshipGroup;
 				JSONObject graph, node, relationship;
-				graph = ((JSONObject) data.get(0)).getJSONObject("graph");
-				nodeGroup = graph.getJSONArray("nodes");
-				relationshipGroup = graph.getJSONArray("relationships");
 				
-				for (int j = 0; j < nodeGroup.length(); j++) {
-					node = ((JSONObject) nodeGroup.get(j));
-					name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
-					propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
+				for (int j = 0; j < data.length(); j++) {
+					graph = ((JSONObject) data.get(j)).getJSONObject("graph");
+					nodeGroup = graph.getJSONArray("nodes");
+					relationshipGroup = graph.getJSONArray("relationships");
 					
-					nodesD3 += "\n{\"id\":\"" + node.getString("id") +
-							"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name).replace('\n', ' ').replace('\t', ' ') +
-							"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie).replace('\n', ' ').replace('\t', ' ') +
-							"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
-				}
-				
-				for (int j = 0; j < relationshipGroup.length(); j++) {
-					relationship = ((JSONObject) relationshipGroup.get(j));
-					linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
-							"\", \"target\":\"" + relationship.getString("endNode") + 
-							"\", \"type\":\"" + relationship.getString("type") +"\"},";
+					for (int k = 0; k < nodeGroup.length(); k++) {
+						node = ((JSONObject) nodeGroup.get(k));
+						name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
+						propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
+						
+						// Nao inclui no's repetidos
+						if (! nodesD3.contains("{\"id\":\"" + node.getString("id")))
+							nodesD3 += "\n{\"id\":\"" + node.getString("id") +
+									"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name).replace('\n', ' ').replace('\t', ' ') +
+									"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie).replace('\n', ' ').replace('\t', ' ') +
+									"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
+					}
+					
+					for (int k = 0; k < relationshipGroup.length(); k++) {
+						relationship = ((JSONObject) relationshipGroup.get(k));
+						linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
+								"\", \"target\":\"" + relationship.getString("endNode") + 
+								"\", \"type\":\"" + relationship.getString("type") +"\"},";
+					}
 				}
 			}
 			
@@ -219,4 +240,11 @@ public class SearchPathwayBean implements Serializable {
 		return compounds;
 	}
 	
+	public HtmlOutputText getResult() {
+		return result;
+	}
+
+	public void setResult(HtmlOutputText result) {
+		this.result = result;
+	}
 }

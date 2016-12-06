@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,6 +23,8 @@ import javax.ws.rs.core.Response;
 import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
 import org.primefaces.json.JSONObject;
+import org.w3c.dom.html.HTMLDivElement;
+import org.w3c.dom.html.HTMLObjectElement;
 
 import com.system.model.Organism;
 import com.system.service.SearchInOrganismServico;
@@ -49,25 +52,39 @@ public class SearchEnzymeBean implements Serializable {
 	
 	private String organism, ec;
 	
+	private HtmlOutputText result;
+	
+	
 	public static List<String> enzymes = new ArrayList<>();
+	
+	
 	
 	public void preRender() {
 		enzymes = searchInOrganismServico.getAllEnzymes();
+		//emptyJson();
 		buildGraph();
 	}
 	
 	public SearchEnzymeBean() {
 	}
 	
-	public Boolean searchEnzymeInOrganism() throws ServletException, IOException {
+	public void searchEnzymeInOrganism() throws ServletException, IOException, InterruptedException {
 		organism = (String) request.getSession().getAttribute("organismSelected");
-		if (! buildGraph()) {
-			return false; // Nao existe essa enzima no 2Path
-		}
-		response.sendRedirect("#");
-		facesContext.responseComplete();
+		String resultValue = "";
+		String resultStyle = "";
 		
-		return true;
+		// TODO: Trocar por query que soh verifica se existe
+		if (buildGraph() == false) {
+			resultStyle = "font-size:18px;color:red";
+			resultValue = (organism.isEmpty()) ? "Enzyme not found" : "Enzyme not found in organism " + organism;
+		}
+		else {
+			resultStyle = "font-size:18px;color:green";
+			resultValue = (organism.isEmpty()) ? "Enzyme found" : "Enzyme found in organism " + organism;
+		}
+				
+		result.setStyle(resultStyle);
+		result.setValue(resultValue);
 	}
 
 	public List<String> suggestKeywords(String consulta) {
@@ -81,11 +98,31 @@ public class SearchEnzymeBean implements Serializable {
 		return keywordsSugested;
 	}
 
+	private void emptyJson() {
+		try {
+			// Overwrites the file if it already exists
+			File f = new File(GRAPH_JSON_FILE_PATH);
+			PrintWriter jsonFile = null;
+			if (f.exists()) {
+				f.setWritable(true);
+				f.setReadable(true);
+				jsonFile = new PrintWriter(f);
+				jsonFile.write("{\"nodes\":[],\"links\":[]}");
+				jsonFile.write("");
+				jsonFile.close();
+			}
+		}
+		catch (IOException e) {
+			System.out.println("unexpected IO issue: " + e);
+		}
+		return;
+	}
+	
 	private Boolean buildGraph() {
 		System.out.println("Organism: "+ organism);
 		System.out.println("Enzyme: "+ ec);
 		
-		String neo4jResponse = null;
+		List<String> neo4jResponse = null;
 		if (ec != null) 
 			neo4jResponse = searchInOrganismServico.getJsonForEnzyme(organism, ec);
 		
@@ -97,11 +134,17 @@ public class SearchEnzymeBean implements Serializable {
 				f.setWritable(true);
 				f.setReadable(true);
 				jsonFile = new PrintWriter(f);
-				neo4jResponse = parseNeo4jResult(neo4jResponse);
 				
-				jsonFile.write(neo4jResponse);
+				String allData;
+				allData = parseNeo4jResult(neo4jResponse);
+				
+				jsonFile.write(allData);
 				jsonFile.write("");
 				jsonFile.close();
+				return allData
+						.replaceAll("\\s+","")
+						.equals("{\"nodes\":[],\"links\":[]}") 
+						? false : true; // Retorna falso se graof eh vazio
 			}
 		}
 		catch (IOException e) {
@@ -110,38 +153,50 @@ public class SearchEnzymeBean implements Serializable {
 		return false;
 	}
 	
-	private String parseNeo4jResult(String jsonObj) {
+	private String parseNeo4jResult(List<String> jsonObj) {
 		String nodesD3 = "", linksD3 = "";
 		String name, propertie;
 		
-		// Se procura-se enzima sem organismo ou resultado retornou string vazia
-		if ((jsonObj == null) || (jsonObj.equals("[]")))
+		if (jsonObj == null)
 			return "{ \"nodes\": [], \"links\": [] }";
 		
 		try {
-			JSONArray data = new JSONArray(jsonObj);
-			JSONArray nodeGroup, relationshipGroup;
-			JSONObject graph, node, relationship;
-			graph = ((JSONObject) data.get(0)).getJSONObject("graph");
-			nodeGroup = graph.getJSONArray("nodes");
-			relationshipGroup = graph.getJSONArray("relationships");
-			
-			for (int j = 0; j < nodeGroup.length(); j++) {
-				node = ((JSONObject) nodeGroup.get(j));
-				name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
-				propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
+			for (int i = 0; i < jsonObj.size(); i ++) {
+				JSONArray data = new JSONArray(jsonObj.get(i));
+				JSONArray nodeGroup, relationshipGroup;
+				JSONObject graph, node, relationship;
 				
-				nodesD3 += "\n{\"id\":\"" + node.getString("id") +
-						"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name).replace('\n', ' ').replace('\t', ' ') +
-						"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie).replace('\n', ' ').replace('\t', ' ') +
-						"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
-			}
-			
-			for (int j = 0; j < relationshipGroup.length(); j++) {
-				relationship = ((JSONObject) relationshipGroup.get(j));
-				linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
-						"\", \"target\":\"" + relationship.getString("endNode") + 
-						"\", \"type\":\"" + relationship.getString("type") +"\"},";
+				for (int j = 0; j < data.length(); j++) {
+					graph = ((JSONObject) data.get(j)).getJSONObject("graph");
+					nodeGroup = graph.getJSONArray("nodes");
+					relationshipGroup = graph.getJSONArray("relationships");
+					
+					for (int k = 0; k < nodeGroup.length(); k++) {
+						node = ((JSONObject) nodeGroup.get(k));
+						name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
+						propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
+						
+						// Nao inclui no's repetidos
+						if (! nodesD3.contains("{\"id\":\"" + node.getString("id")))
+							nodesD3 += "\n{\"id\":\"" + node.getString("id") +
+									"\", \"name\":\"" + (node.getJSONObject("properties"))
+														.getString(name)
+														.replaceAll("\\n+", "")
+														.replaceAll("\\t+", "") +
+									"\", \"propertie\":\"" + (node.getJSONObject("properties"))
+															.getString(propertie)
+															.replaceAll("\\n+", "").
+															replaceAll("\\t+", "") +
+									"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
+					}
+					
+					for (int k = 0; k < relationshipGroup.length(); k++) {
+						relationship = ((JSONObject) relationshipGroup.get(k));
+						linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
+								"\", \"target\":\"" + relationship.getString("endNode") + 
+								"\", \"type\":\"" + relationship.getString("type") +"\"},";
+					}
+				}
 			}
 			
 		}
@@ -149,8 +204,14 @@ public class SearchEnzymeBean implements Serializable {
 			System.out.println("unexpected JSON exception : " + e);
 		}
 		
-		return "{ \"nodes\": [ " + nodesD3.substring(0, nodesD3.length()-1) +
-			"],\n \"links\": [ " + linksD3.substring(0, linksD3.length()-1) + "]}";
+		int nodeLenght = nodesD3.length();
+		int linkLenght = linksD3.length();
+		
+		if (!nodesD3.isEmpty()) nodeLenght = nodesD3.length()-1;
+		if (!linksD3.isEmpty()) linkLenght = linksD3.length()-1;
+		
+		return "{ \"nodes\": [ " + nodesD3.substring(0, nodeLenght) +
+			"], \"links\": [ " + linksD3.substring(0, linkLenght) + "]}";
 	}
 	
 	private String getName(String label) {
@@ -207,6 +268,14 @@ public class SearchEnzymeBean implements Serializable {
 	
 	public List<String> getEnzymes() {
 		return enzymes;
+	}
+
+	public HtmlOutputText getResult() {
+		return result;
+	}
+
+	public void setResult(HtmlOutputText result) {
+		this.result = result;
 	}
 	
 }

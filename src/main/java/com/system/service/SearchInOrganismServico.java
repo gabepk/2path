@@ -30,7 +30,7 @@ public class SearchInOrganismServico implements Serializable {
 		return organisms.getAllEnzymes();
 	}
 	
-	public String getJsonForEnzyme(String organism, String ec) {
+	public List<String> getJsonForEnzyme(String organism, String ec) {
 		return organisms.getJsonForEnzyme(organism, ec);
 	}
 	
