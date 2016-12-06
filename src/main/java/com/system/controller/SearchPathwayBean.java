@@ -64,7 +64,7 @@ public class SearchPathwayBean implements Serializable {
 		String resultStyle = "";
 		
 		// TODO: Trocar por query que soh verifica se existe
-		if (buildGraph() == false) {
+		if (buildGraph().isEmpty()) {
 			resultStyle = "font-size:18px;color:red";
 			resultValue = (organism.isEmpty()) ? "Pathway not found" : "Pathway not found in organism " + organism;
 		}
@@ -88,7 +88,7 @@ public class SearchPathwayBean implements Serializable {
 		return keywordsSugested;
 	}
 
-	public Boolean buildGraph() {
+	public String buildGraph() {
 		System.out.println("Organism: "+ organism);
 		System.out.println("Substract: "+ substract);
 		System.out.println("Product: "+ product);
@@ -118,13 +118,13 @@ public class SearchPathwayBean implements Serializable {
 				return allData
 						.replaceAll("\\s+","")
 						.equals("{\"nodes\":[],\"links\":[]}") 
-						? false : true; // Retorna falso se grafo eh vazio
+						? "" : allData; // Retorna falso se grafo eh vazio
 			}
 		}
 		catch (IOException e) {
 			System.out.println("unexpected IO issue: " + e);
 		}
-		return false;
+		return "";
 	}
 	
 	private String parseNeo4jResult(List<String> jsonObj) {

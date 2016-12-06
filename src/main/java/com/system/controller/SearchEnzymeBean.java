@@ -72,9 +72,10 @@ public class SearchEnzymeBean implements Serializable {
 		organism = (String) request.getSession().getAttribute("organismSelected");
 		String resultValue = "";
 		String resultStyle = "";
+		String json = buildGraph();
 		
 		// TODO: Trocar por query que soh verifica se existe
-		if (buildGraph() == false) {
+		if (json.replaceAll("\\s+","").equals("{\"nodes\":[],\"links\":[]}")) {
 			resultStyle = "font-size:18px;color:red";
 			resultValue = (organism.isEmpty()) ? "Enzyme not found" : "Enzyme not found in organism " + organism;
 		}
@@ -85,6 +86,14 @@ public class SearchEnzymeBean implements Serializable {
 				
 		result.setStyle(resultStyle);
 		result.setValue(resultValue);
+		
+		try {
+			JSONObject jsonGraph;
+			jsonGraph = new JSONObject(json);
+			request.getSession().setAttribute("jsonGraph", jsonGraph);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public List<String> suggestKeywords(String consulta) {
@@ -118,7 +127,7 @@ public class SearchEnzymeBean implements Serializable {
 		return;
 	}
 	
-	private Boolean buildGraph() {
+	public String buildGraph() {
 		System.out.println("Organism: "+ organism);
 		System.out.println("Enzyme: "+ ec);
 		
@@ -144,13 +153,13 @@ public class SearchEnzymeBean implements Serializable {
 				return allData
 						.replaceAll("\\s+","")
 						.equals("{\"nodes\":[],\"links\":[]}") 
-						? false : true; // Retorna falso se graof eh vazio
+						? "{\"nodes\":[],\"links\":[]}" : allData; // Retorna "" se graof eh vazio
 			}
 		}
 		catch (IOException e) {
 			System.out.println("unexpected IO issue: " + e);
 		}
-		return false;
+		return "";
 	}
 	
 	private String parseNeo4jResult(List<String> jsonObj) {
