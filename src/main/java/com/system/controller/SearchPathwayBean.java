@@ -1,21 +1,18 @@
 package com.system.controller;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
@@ -30,23 +27,15 @@ public class SearchPathwayBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String GRAPH_JSON_FILE_PATH = "curso-primefaces/EnzymeGraph/src/main/webapp/resources/json/graph.json";
-	
 	@Inject
 	private SearchInOrganismServico searchInOrganismServico; 
 	
 	@Inject
-	private FacesContext facesContext;
-	
-	@Inject
 	private HttpServletRequest request;
-	
-	@Inject
-	private HttpServletResponse response;
 	
 	private String organism, substract, product;
 	
-	private HtmlOutputText result;
+	private String jsonGraphString;
 	
 	public static List<String> compounds = new ArrayList<>();
 	
@@ -58,30 +47,24 @@ public class SearchPathwayBean implements Serializable {
 	}
 	
 	public void searchPathwayInOrganism() throws ServletException, IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		FacesMessage message;
 		organism = (String) request.getSession().getAttribute("organismSelected");
 		String resultValue = "";
-		String resultStyle = "";
 		String json = buildGraph();
 		
 		if (json.replaceAll("\\s+","").equals("{\"nodes\":[],\"links\":[]}")) {
-			resultStyle = "font-size:18px;color:red";
 			resultValue = (organism.isEmpty()) ? "Pathway not found" : "Pathway not found in organism " + organism;
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",  resultValue);
+			
 		}
 		else {
-			resultStyle = "font-size:18px;color:green";
 			resultValue = (organism.isEmpty()) ? "Pathway found" : "Pathway found in organism " + organism;
+			message = new FacesMessage("Successful",  resultValue);
 		}
-				
-		result.setStyle(resultStyle);
-		result.setValue(resultValue);
 		
-		try {
-			JSONObject jsonGraph;
-			jsonGraph = new JSONObject(json);
-			request.getSession().setAttribute("jsonGraph", jsonGraph);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		context.addMessage(null, message);
+		jsonGraphString = json;
 	}
 
 	public List<String> suggestKeywords(String consulta) {
@@ -112,7 +95,6 @@ public class SearchPathwayBean implements Serializable {
 				.equals("{\"nodes\":[],\"links\":[]}") 
 				? "{\"nodes\":[],\"links\":[]}" 
 				: allData;
-
 	}
 	
 	private String parseNeo4jResult(List<String> jsonObj) {
@@ -228,11 +210,11 @@ public class SearchPathwayBean implements Serializable {
 		return compounds;
 	}
 	
-	public HtmlOutputText getResult() {
-		return result;
+	public String getJsonGraphString() {
+		return jsonGraphString;
 	}
 
-	public void setResult(HtmlOutputText result) {
-		this.result = result;
+	public void setJsonGraphString(String jsonGraphString) {
+		this.jsonGraphString = jsonGraphString;
 	}
 }

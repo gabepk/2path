@@ -11,50 +11,188 @@
 	</ui:define>
 
 	<ui:define name="body">
-		<f:metadata>
-			<fp:viewAction id="enzymesViewAction" name="enzymes"
-				action="#{searchEnzymeBean.preRender}" />
-		</f:metadata>
 		<h:form>
+			<p:growl id="growl" showDetail="true" autoUpdate="true"
+			infoStyle="color:darkgreen" errorStyle="color:darkred" /> 
 			<div class="row">
 				<div class="col-md-3">
-					<div class="row" style="margin-top: 25px">
-						<p:messages autoUpdate="true" closable="true" />
+					<div style="margin-bottom: 20px">
+						<h3>Search for an enzyme</h3>
 					</div>
-					<h2>Search for an enzyme</h2>
 					<h:panelGroup>
-
-						<p:outputLabel value="Enzyme" for="searchInput" />
-						<p:autoComplete id="searchInput" value="#{searchEnzymeBean.ec}"
-							completeMethod="#{searchEnzymeBean.suggestKeywords}"
-							required="true" forceSelection="false" var="key"
-							itemLabel="#{key}" itemValue="#{key}"
-							style="margin-top:20px; margin-bottom:50px" maxResults="10" />
+						<p:outputLabel value="EC Number" for="searchInput" />
+						<p:inputText id="searchInput" value="#{searchEnzymeBean.ec}" required="true"
+						var="key" itemLabel="#{key}" itemValue="#{key}"
+						style="margin-top:5px; margin-bottom:5px" />
 						<p:watermark for="searchInput" value="Enter an EC number"
 							id="watermark" />
-						<div style="margin-top:50px;">
-							<p:commandButton class="btn btn-block btn-success" value="Search"
-								for="searchInput"
-								action="#{searchEnzymeBean.searchEnzymeInOrganism}" ajax="false"
-								icon="ui-icon-search" update="graphView">
-							</p:commandButton>
-						</div>
 					</h:panelGroup>
-				</div>
-				<div class="col-md-1"></div>
-				<div class="col-md-3">
-					<div style="margin-top:50px; border-bottom: dotted #707070;">
-						<h2 style="margin-bottom:50px" >Result: </h2>
-						<h:outputText id="result" binding="#{searchEnzymeBean.result}"/> 
+					
+					<div style="margin-top:5px;">
+						<p:commandButton class="btn btn-block btn-info" value="Search"
+							for="searchInput" icon="ui-icon-search" update="growl"
+							action="#{searchEnzymeBean.searchEnzymeInOrganism}" ajax="false">
+						</p:commandButton>
 					</div>
 					
-					<div style="margin-top:50px">
-						<p:button outcome="ViewGraph.xhtml" value="View interactive data"
-						  class="btn btn-block btn-success" >
-						</p:button>
+					<div style="margin-top:20px;">
+						<p:button value="Return to Search Page" class="btn btn-block btn-info"
+						outcome="Search.xhtml" icon="ui-icon-arrowthick-1-w"/>
+					</div>
+					
+					<h3 style="margin-top:25px" >Labels </h3>
+					<div style="margin-top:5px">
+						<p:graphicImage library="images" name="legenda.png"
+						style="width:100%;height:100%;" />
 					</div>
 				</div>
-				<div class="col-md-5"></div>
+				<div class="col-md-9">
+				    <input id="graph_json" type='hidden' value="#{searchEnzymeBean.jsonGraphString}" />
+					<style>
+					    .link {
+						  fill: none;
+						  stroke: #666;
+						  stroke-width: 1.5px;
+						}
+						
+						circle {
+						  fill: #ccc;
+						  stroke: #333;
+						  stroke-width: 1.5px;
+						}
+						
+						.nodeReactions {
+						  fill: #f77;
+						}
+						.nodeCompounds {
+						  fill: #7f7;
+						}
+						.nodeOrganism {
+						  fill: #77f;
+						}
+						.nodeEnzymes {
+						  fill: #ff7;
+						}
+						.nodeSequences {
+						  fill: #7ff;
+						}
+						
+						text {
+						  font: 12px sans-serif;
+						  pointer-events: none;
+						  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+						}
+					</style>
+					<svg id="graphView"></svg>
+					<script src="resources/js/jquery-1.2.6.min.js"></script>
+					<script src="resources/js/d3.v4.min.js"></script>
+					<script>
+						var width = 900, height = 600;
+						
+						var svg = d3.select("svg")
+							.attr("width", width).attr("height", height);
+						
+						var color = d3.scaleOrdinal(d3.schemeCategory20);
+						
+						var simulation = d3.forceSimulation()
+					   	 .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(150).strength(1))
+					   	 .force("charge", d3.forceManyBody())
+					   	 .force("center", d3.forceCenter(width / 2, height / 2))
+					   	 .alphaTarget(1);
+		
+						var jsonGraph = $("#graph_json").val();
+						var graph = JSON.parse(jsonGraph);
+						
+						  simulation
+						      .nodes(graph.nodes)
+						      .on("tick", tick);
+			
+						  simulation.force("link")
+						      .links(graph.links);
+						  
+			             svg.append("defs").selectAll("marker").data(
+								[ "CATALYSE", "HAS", "MATCHES",
+								  "SUBSTRATE_FOR", "PRODUCTOF"]).enter()
+								.append("marker").attr("id", function(d) {
+									return d;
+								}).attr("viewBox", "0 -5 10 10").attr("refX",
+										15).attr("refY", -1.5).attr(
+										"markerWidth", 15).attr("markerHeight",
+										15).attr("orient", "auto").append(
+										"path").attr("d", "M0,-2L5,0L0,02");
+					  
+			              var path = svg.append("g")
+			              			.selectAll("path")
+			              			.data(graph.links)
+			            		  	.enter()
+			            		  	.append("path")
+			            		  	.attr("class", function(d) {
+										return "link " + d.type;
+									})
+									.attr("marker-end", function(d) {
+										return "url(#" + d.type + ")";
+						  			});
+			          
+				          var circle = svg.append("g")
+				          				  .selectAll("circle")
+				          				  .data(graph.nodes)
+				          				  .enter()
+				          				  .append("circle")
+				          				  .attr("r", 22)
+										  .attr("class", function(d) {return "node" + d.label;})
+										  .call(d3.drag()
+										          .on("start", dragstarted)
+										          .on("drag", dragged)
+										          .on("end", dragended));
+				          var text = svg.append("g").selectAll("text")
+				          				  .data(graph.nodes)
+				          				  .enter()
+				          				  .append("text")
+				          				  .attr("x", -20)
+				          				  .attr("y", ".31em")
+				          				  .text(function(d) {
+												return d.name;
+				          				  }
+							);
+				          
+				          function tick() {
+				        	  path.attr("d", linkArc);
+				        	  circle.attr("transform", transform);
+				        	  text.attr("transform", transform);
+				          }
+				          
+				          function linkArc(d) {
+				        	  var dx = d.target.x - d.source.x,
+				        	      dy = d.target.y - d.source.y,
+				        	      dr = Math.sqrt(dx * dx + dy * dy);
+				        	  return "M" + d.source.x + "," + d.source.y + 
+				        	  		"A" + dr + "," + dr + " 0 0,1 " + 
+				        	  		d.target.x + "," + d.target.y;
+				          }
+				          
+				          function transform(d) {
+				        	  return "translate(" + d.x + "," + d.y + ")";
+				          }
+				          
+				          function dragstarted(d) {
+				        	  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+				        	  d.fx = d.x;
+				        	  d.fy = d.y;
+				        	}
+			
+				        	function dragged(d) {
+				        	  d.fx = d3.event.x;
+				        	  d.fy = d3.event.y;
+				        	}
+			
+				        	function dragended(d) {
+				        	  if (!d3.event.active) simulation.alphaTarget(0);
+				        	  d.fx = null;
+				        	  d.fy = null;
+				        	}
+				          
+					</script>
+				</div>
 			</div>
 		</h:form>
 	</ui:define>

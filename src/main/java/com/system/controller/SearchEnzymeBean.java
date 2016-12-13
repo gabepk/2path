@@ -1,32 +1,22 @@
 package com.system.controller;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.component.html.HtmlOutputText;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
 
 import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
 import org.primefaces.json.JSONObject;
-import org.w3c.dom.html.HTMLDivElement;
-import org.w3c.dom.html.HTMLObjectElement;
 
-import com.system.model.Organism;
 import com.system.service.SearchInOrganismServico;
 
 @Named
@@ -36,70 +26,37 @@ public class SearchEnzymeBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String GRAPH_JSON_FILE_PATH = "curso-primefaces/EnzymeGraph/src/main/webapp/resources/json/graph.json";
-	
 	@Inject
 	private SearchInOrganismServico searchInOrganismServico; 
 	
 	@Inject
-	private FacesContext facesContext;
-	
-	@Inject
 	private HttpServletRequest request;
-	
-	@Inject
-	private HttpServletResponse response;
 	
 	private String organism, ec;
 	
-	private HtmlOutputText result;
-	
-	
-	public static List<String> enzymes = new ArrayList<>();
-	
-	public void preRender() {
-		enzymes = searchInOrganismServico.getAllEnzymes();
-	}
-	
+	private String jsonGraphString;
+
 	public SearchEnzymeBean() {
 	}
 	
 	public void searchEnzymeInOrganism() throws ServletException, IOException, InterruptedException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		FacesMessage message;
 		organism = (String) request.getSession().getAttribute("organismSelected");
 		String resultValue = "";
-		String resultStyle = "";
 		String json = buildGraph();
 		
 		if (json.replaceAll("\\s+","").equals("{\"nodes\":[],\"links\":[]}")) {
-			resultStyle = "font-size:18px;color:red";
 			resultValue = (organism.isEmpty()) ? "Enzyme not found" : "Enzyme not found in organism " + organism;
+			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",  resultValue);
 		}
 		else {
-			resultStyle = "font-size:18px;color:green";
 			resultValue = (organism.isEmpty()) ? "Enzyme found" : "Enzyme found in organism " + organism;
+			message = new FacesMessage("Successful",  resultValue);
 		}
 				
-		result.setStyle(resultStyle);
-		result.setValue(resultValue);
-		
-		try {
-			JSONObject jsonGraph;
-			jsonGraph = new JSONObject(json);
-			request.getSession().setAttribute("jsonGraph", jsonGraph);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public List<String> suggestKeywords(String consulta) {
-		List<String> keywordsSugested = new ArrayList<>();
-		
-		for (String key : enzymes) {
-            if (key.toLowerCase().startsWith(consulta.toLowerCase())) {
-            	keywordsSugested.add(key);
-            }
-        }
-		return keywordsSugested;
+		context.addMessage(null, message);
+		jsonGraphString = json;
 	}
 	
 	public String buildGraph() {
@@ -233,16 +190,12 @@ public class SearchEnzymeBean implements Serializable {
 		this.ec = ec;
 	}
 	
-	public List<String> getEnzymes() {
-		return enzymes;
+	public String getJsonGraphString() {
+		return jsonGraphString;
 	}
 
-	public HtmlOutputText getResult() {
-		return result;
-	}
-
-	public void setResult(HtmlOutputText result) {
-		this.result = result;
+	public void setJsonGraphString(String jsonGraphString) {
+		this.jsonGraphString = jsonGraphString;
 	}
 	
 }

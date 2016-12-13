@@ -16,54 +16,191 @@
 				action="#{searchPathwayBean.preRender}" />
 		</f:metadata>
 		<h:form>
+			<p:growl id="growl" showDetail="true" autoUpdate="true" 
+			infoStyle="color:darkgreen" errorStyle="color:darkred" /> 
 			<div class="row">
 				<div class="col-md-3">
-					<div class="row" style="margin-top: 25px">
-						<p:messages autoUpdate="true" closable="true" />
+					<div style="margin-bottom: 20px">
+						<h3>Search for a pathway between two components</h3>
 					</div>
-					<h2>
-						Search for a pathway
-					</h2>
-					<p>
-						Enter the name of a Compound
-					</p>
 					<h:panelGroup>
-						
-						<p:outputLabel value="From" for="searchInput_1"/>
+						<p:outputLabel value="From Component" for="searchInput_1"/>
 						<p:autoComplete id="searchInput_1" value="#{searchPathwayBean.substract}" 
 							completeMethod="#{searchPathwayBean.suggestKeywords}" required="true"
 							forceSelection="false" var="key_1" itemLabel="#{key_1}" itemValue="#{key_1}" 
 							style="margin-top:20px; margin-bottom:50px" maxResults="10"/>
 						<p:watermark for="searchInput_1" value="Enter a substract" id="watermark_1" />
 					
-						<p:outputLabel value="To" for="searchInput_2"/>
+						<p:outputLabel value="To Component" for="searchInput_2"/>
 						<p:autoComplete id="searchInput_2" value="#{searchPathwayBean.product}" 
 							completeMethod="#{searchPathwayBean.suggestKeywords}" required="true"
 							forceSelection="false" var="key_2" itemLabel="#{key_2}" itemValue="#{key_2}" 
 							style="margin-top:20px; margin-bottom:50px" maxResults="10"/>
 						<p:watermark for="searchInput_2" value="Enter a product" id="watermark_2" />
-					
-						<div style="margin-top:50px;">
-							<p:commandButton class="btn btn-block btn-success" value="Search"
-						   	 for="searchInput_1, searchInput_2" action="#{searchPathwayBean.searchPathwayInOrganism}" 
-						   	 ajax="false" icon="ui-icon-search" update="graphView" />
-						</div>
 					</h:panelGroup>	
-				</div>
-				<div class="col-md-1"></div>
-				<div class="col-md-3">
-					<div style="margin-top:50px; border-bottom: dotted #707070;">
-						<h2 style="margin-bottom:50px" >Result: </h2>
-						<h:outputText id="result" binding="#{searchPathwayBean.result}"/> 
+					<div style="margin-top:5px;">
+						<p:commandButton class="btn btn-block btn-info" value="Search"
+					   	 for="searchInput_1, searchInput_2" action="#{searchPathwayBean.searchPathwayInOrganism}" 
+					   	 ajax="false" icon="ui-icon-search" update="growl" />
+					</div>
+					<div style="margin-top:20px;">
+						<p:button value="Return to Search Page" class="btn btn-block btn-warning"
+						outcome="Search.xhtml" icon="ui-icon-arrowthick-1-w"/>
 					</div>
 					
-					<div style="margin-top:50px">
-						<p:button outcome="ViewGraph.xhtml" value="View interactive data"
-						  class="btn btn-block btn-success" >
-						</p:button>
+					<h3 style="margin-top:25px" >Labels </h3>
+					<div style="margin-top:5px">
+						<p:graphicImage library="images" name="legenda.png"
+						style="width:100%;height:100%;" />
 					</div>
+					
 				</div>
-				<div class="col-md-5"></div>
+				<div class="col-md-9">
+				<input id="graph_json" type='hidden' value="#{searchPathwayBean.jsonGraphString}" />
+					<style>
+					    .link {
+						  fill: none;
+						  stroke: #666;
+						  stroke-width: 1.5px;
+						}
+						
+						circle {
+						  fill: #ccc;
+						  stroke: #333;
+						  stroke-width: 1.5px;
+						}
+						
+						.nodeReactions {
+						  fill: #f77;
+						}
+						.nodeCompounds {
+						  fill: #7f7;
+						}
+						.nodeOrganism {
+						  fill: #77f;
+						}
+						.nodeEnzymes {
+						  fill: #ff7;
+						}
+						.nodeSequences {
+						  fill: #7ff;
+						}
+						
+						text {
+						  font: 12px sans-serif;
+						  pointer-events: none;
+						  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+						}
+					</style>
+					<svg id="graphView"></svg>
+					<script src="resources/js/d3.v4.min.js"></script>
+					<script>
+						var width = 900, height = 600;
+						
+						var svg = d3.select("svg")
+							.attr("width", width).attr("height", height);
+						
+						var color = d3.scaleOrdinal(d3.schemeCategory20);
+						
+						var simulation = d3.forceSimulation()
+					   	 .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(150).strength(1))
+					   	 .force("charge", d3.forceManyBody())
+					   	 .force("center", d3.forceCenter(width / 2, height / 2))
+					   	 .alphaTarget(1);
+		
+						var jsonGraph = $("#graph_json").val();
+						var graph = JSON.parse(jsonGraph);
+						
+						  simulation
+						      .nodes(graph.nodes)
+						      .on("tick", tick);
+			
+						  simulation.force("link")
+						      .links(graph.links);
+						  
+			             svg.append("defs").selectAll("marker").data(
+								[ "CATALYSE", "HAS", "MATCHES",
+								  "SUBSTRATE_FOR", "PRODUCTOF"]).enter()
+								.append("marker").attr("id", function(d) {
+									return d;
+								}).attr("viewBox", "0 -5 10 10").attr("refX",
+										15).attr("refY", -1.5).attr(
+										"markerWidth", 15).attr("markerHeight",
+										15).attr("orient", "auto").append(
+										"path").attr("d", "M0,-2L5,0L0,02");
+					  
+			              var path = svg.append("g")
+			              			.selectAll("path")
+			              			.data(graph.links)
+			            		  	.enter()
+			            		  	.append("path")
+			            		  	.attr("class", function(d) {
+										return "link " + d.type;
+									})
+									.attr("marker-end", function(d) {
+										return "url(#" + d.type + ")";
+						  			});
+			          
+				          var circle = svg.append("g")
+				          				  .selectAll("circle")
+				          				  .data(graph.nodes)
+				          				  .enter()
+				          				  .append("circle")
+				          				  .attr("r", 22)
+										  .attr("class", function(d) {return "node" + d.label;})
+										  .call(d3.drag()
+										          .on("start", dragstarted)
+										          .on("drag", dragged)
+										          .on("end", dragended));
+				          var text = svg.append("g").selectAll("text")
+				          				  .data(graph.nodes)
+				          				  .enter()
+				          				  .append("text")
+				          				  .attr("x", -20)
+				          				  .attr("y", ".31em")
+				          				  .text(function(d) {
+												return d.name;
+				          				  }
+							);
+				          
+				          function tick() {
+				        	  path.attr("d", linkArc);
+				        	  circle.attr("transform", transform);
+				        	  text.attr("transform", transform);
+				          }
+				          
+				          function linkArc(d) {
+				        	  var dx = d.target.x - d.source.x,
+				        	      dy = d.target.y - d.source.y,
+				        	      dr = Math.sqrt(dx * dx + dy * dy);
+				        	  return "M" + d.source.x + "," + d.source.y + 
+				        	  		"A" + dr + "," + dr + " 0 0,1 " + 
+				        	  		d.target.x + "," + d.target.y;
+				          }
+				          
+				          function transform(d) {
+				        	  return "translate(" + d.x + "," + d.y + ")";
+				          }
+				          
+				          function dragstarted(d) {
+				        	  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+				        	  d.fx = d.x;
+				        	  d.fy = d.y;
+				        	}
+			
+				        	function dragged(d) {
+				        	  d.fx = d3.event.x;
+				        	  d.fy = d3.event.y;
+				        	}
+			
+				        	function dragended(d) {
+				        	  if (!d3.event.active) simulation.alphaTarget(0);
+				        	  d.fx = null;
+				        	  d.fy = null;
+				        	}
+				          
+					</script>
+				</div>
 			</div>
 		</h:form>
 	</ui:define>

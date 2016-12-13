@@ -67,15 +67,14 @@ public class SearchInOrganismBean implements Serializable {
 	    response.sendRedirect("/EnzymeGraph/SearchEnzyme.xhtml");
 		
 	    System.out.println("organismSelected: "+ organismSelected.getTaxName());
-	    
 		facesContext.responseComplete();
 	}
 	
 	public void searchPathwayInOrganism() throws ServletException, IOException {
-		System.out.println("organismSelected: "+ organismSelected);
 		request.getSession().setAttribute("organismSelected", organismSelected.getTaxName());
 	    response.sendRedirect("/EnzymeGraph/SearchPathway.xhtml");
-		
+	    
+	    System.out.println("organismSelected: "+ organismSelected.getTaxName());
 		facesContext.responseComplete();
 	}
 	
