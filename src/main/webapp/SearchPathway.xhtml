@@ -51,7 +51,7 @@
 					<h3 style="margin-top:25px" >Labels </h3>
 					<div style="margin-top:5px">
 						<p:graphicImage library="images" name="legenda.png"
-						style="width:100%;height:100%;" />
+						style="width:40%;height:40%;" />
 					</div>
 					
 				</div>
@@ -104,9 +104,8 @@
 						
 						var simulation = d3.forceSimulation()
 					   	 .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(150).strength(1))
-					   	 .force("charge", d3.forceManyBody())
-					   	 .force("center", d3.forceCenter(width / 2, height / 2))
-					   	 .alphaTarget(1);
+					   	 .force("collide",d3.forceCollide(75))
+					   	 .force("center", d3.forceCenter(width / 2, height / 2));
 		
 						var jsonGraph = $("#graph_json").val();
 						var graph = JSON.parse(jsonGraph);

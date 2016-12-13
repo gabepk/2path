@@ -41,6 +41,9 @@ public class SearchPathwayBean implements Serializable {
 	
 	public void preRender() {
 		compounds = searchInOrganismServico.getAllCompounds();
+		jsonGraphString = "";
+		substract = "";
+		product = "";
 	}
 	
 	public SearchPathwayBean() {
@@ -106,37 +109,56 @@ public class SearchPathwayBean implements Serializable {
 			return "{ \"nodes\": [], \"links\": [] }";
 		
 		try {
-			for (int i = 0; i < jsonObj.size(); i ++) {
-				JSONArray data = new JSONArray(jsonObj.get(i));
-				JSONArray nodeGroup, relationshipGroup;
-				JSONObject graph, node, relationship;
+			JSONArray data = new JSONArray(jsonObj.get(0));
+			JSONArray nodeGroup, relationshipGroup, reactions;
+			JSONObject graph, node, relationship;
+			
+			// Se foi procurado via no organismo, parser deve verificar se todas as reacoes da via ocorrem no organismo
+			reactions = null;
+			if (jsonObj.size() > 1) {
+				reactions = new JSONArray(jsonObj.get(1));
+			}
+			
+			for (int j = 0; j < data.length(); j++) {
+				graph = ((JSONObject) data.get(j)).getJSONObject("graph");
+				nodeGroup = graph.getJSONArray("nodes");
+				relationshipGroup = graph.getJSONArray("relationships");
 				
-				for (int j = 0; j < data.length(); j++) {
-					graph = ((JSONObject) data.get(j)).getJSONObject("graph");
-					nodeGroup = graph.getJSONArray("nodes");
-					relationshipGroup = graph.getJSONArray("relationships");
+				
+				for (int k = 0; k < nodeGroup.length(); k++) {
+					node = ((JSONObject) nodeGroup.get(k));
+					name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
+					propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
 					
-					for (int k = 0; k < nodeGroup.length(); k++) {
-						node = ((JSONObject) nodeGroup.get(k));
-						name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
-						propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
-						
-						// Nao inclui no's repetidos
-						if (! nodesD3.contains("{\"id\":\"" + node.getString("id")))
-							nodesD3 += "\n{\"id\":\"" + node.getString("id") +
-									"\", \"name\":\"" + (node.getJSONObject("properties")).getString(name).replace('\n', ' ').replace('\t', ' ') +
-									"\", \"propertie\":\"" + (node.getJSONObject("properties")).getString(propertie).replace('\n', ' ').replace('\t', ' ') +
-									"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
+					// Verifica se todas as reações da via estao no conjunto de reacoes que o organismo pode catalisar
+					if ((reactions != null) && 
+							(name.equals("reactionName")) && 
+							!(reactions.toString().contains(node.getString("id")))) {
+						return "{ \"nodes\": [], \"links\": [] }";
 					}
 					
-					for (int k = 0; k < relationshipGroup.length(); k++) {
-						relationship = ((JSONObject) relationshipGroup.get(k));
-						linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
-								"\", \"target\":\"" + relationship.getString("endNode") + 
-								"\", \"type\":\"" + relationship.getString("type") +"\"},";
-					}
+					// Nao inclui no's repetidos
+					if (! nodesD3.contains("{\"id\":\"" + node.getString("id")))
+						nodesD3 += "\n{\"id\":\"" + node.getString("id") +
+								"\", \"name\":\"" + (node.getJSONObject("properties"))
+														 .getString(name)
+														 .replace('\n', ' ')
+														 .replace('\t', ' ') +
+								"\", \"propertie\":\"" + (node.getJSONObject("properties"))
+															  .getString(propertie)
+															  .replace('\n', ' ')
+															  .replace('\t', ' ') +
+								"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
+				}
+				
+				for (int k = 0; k < relationshipGroup.length(); k++) {
+					relationship = ((JSONObject) relationshipGroup.get(k));
+					linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
+							"\", \"target\":\"" + relationship.getString("endNode") + 
+							"\", \"type\":\"" + relationship.getString("type") +"\"},";
 				}
 			}
+		
 			
 		}
 		catch (JSONException e) {

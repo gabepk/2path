@@ -36,6 +36,11 @@ public class SearchEnzymeBean implements Serializable {
 	
 	private String jsonGraphString;
 
+	public void preRender() {
+		jsonGraphString = "";
+		ec = "";
+	}
+	
 	public SearchEnzymeBean() {
 	}
 	

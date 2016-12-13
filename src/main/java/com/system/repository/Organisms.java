@@ -160,8 +160,7 @@ public class Organisms implements Serializable {
 				data = ((JSONObject) results.get(0)).getJSONArray("data");
 				
 				// Se pediu para encontrar no organismo, mas nao tem, entao nao existe
-				if ( ! data.isNull(0)) data_set.add(data.toString());
-				else data_set.clear();
+				if (data.isNull(0)) data_set.clear();
 			}
 		}
 		catch (JSONException e) {
@@ -182,8 +181,8 @@ public class Organisms implements Serializable {
 		 * Caminho entre dois compostos e as reacoes entre eles
 		 */
 		query_1 = "MATCH (c1:Compounds{compoundName:\\\"" + substract
-				 +"\\\"})-[r2*]->(c2:Compounds{compoundName:\\\""+ product +"\\\"}) " +
-				"RETURN c1, r2, c2";
+				 +"\\\"})-[r*]->(c2:Compounds{compoundName:\\\""+ product +"\\\"}) " +
+				"RETURN c1, r, c2";
 		payload = "{\"statements\" : [ {\"statement\" : \"" + query_1 + "\", \"parameters\": null," +
 				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
 		String path_between_components = sendTransactionalCypherQuery(payload);
@@ -202,9 +201,9 @@ public class Organisms implements Serializable {
 				/*
 				 * Caminho entre organismo e reacoes (que fazem parte caminho que liga os dois compostos)
 				 */
-				query_2 = "MATCH (o:Organism {taxName:\\\""+ organism + "\\\"})" +
-					    "-[h:HAS]->(s:Sequences)-[m:MATCHES]->(e:Enzymes)-[c:CATALYSE]->(:Reactions) "+
-						"RETURN o, h, s, m, e, c";
+				query_2 = "MATCH (Organism {taxName:\\\""+ organism + "\\\"})" +
+					    "-[HAS]->(Sequences)-[MATCHES]->(Enzymes)-[CATALYSE]->(r:Reactions) "+
+						"RETURN r";
 				payload = "{\"statements\" : [ {\"statement\" : \"" + query_2 + "\", \"parameters\": null," +
 						"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
 				String organism_to_reactions = sendTransactionalCypherQuery(payload);
