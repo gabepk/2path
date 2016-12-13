@@ -2,6 +2,7 @@ package com.system.controller;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.enterprise.context.SessionScoped;
@@ -90,9 +91,10 @@ public class SearchEnzymeBean implements Serializable {
 			return "{ \"nodes\": [], \"links\": [] }";
 		
 		try {
+			// Armazena primeiro todas as arestas, exceto a CATALYSE
 			for (int i = 0; i < jsonObj.size(); i ++) {
 				JSONArray data = new JSONArray(jsonObj.get(i));
-				JSONArray nodeGroup, relationshipGroup;
+				JSONArray nodeGroup, relationshipGroup, reactions;
 				JSONObject graph, node, relationship;
 				
 				for (int j = 0; j < data.length(); j++) {
@@ -100,13 +102,20 @@ public class SearchEnzymeBean implements Serializable {
 					nodeGroup = graph.getJSONArray("nodes");
 					relationshipGroup = graph.getJSONArray("relationships");
 					
+					for (int k = 0; k < relationshipGroup.length(); k++) {
+						relationship = ((JSONObject) relationshipGroup.get(k));
+						linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
+								"\", \"target\":\"" + relationship.getString("endNode") + 
+								"\", \"type\":\"" + relationship.getString("type") +"\"},";					
+					}
+					
 					for (int k = 0; k < nodeGroup.length(); k++) {
 						node = ((JSONObject) nodeGroup.get(k));
 						name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
 						propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
 						
 						// Nao inclui no's repetidos
-						if (! nodesD3.contains("{\"id\":\"" + node.getString("id")))
+						if (!nodesD3.contains("{\"id\":\"" + node.getString("id"))) {
 							nodesD3 += "\n{\"id\":\"" + node.getString("id") +
 									"\", \"name\":\"" + (node.getJSONObject("properties"))
 														.getString(name)
@@ -117,14 +126,9 @@ public class SearchEnzymeBean implements Serializable {
 															.replaceAll("\\n+", "").
 															replaceAll("\\t+", "") +
 									"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
+						}
 					}
 					
-					for (int k = 0; k < relationshipGroup.length(); k++) {
-						relationship = ((JSONObject) relationshipGroup.get(k));
-						linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
-								"\", \"target\":\"" + relationship.getString("endNode") + 
-								"\", \"type\":\"" + relationship.getString("type") +"\"},";
-					}
 				}
 			}
 			
@@ -159,7 +163,7 @@ public class SearchEnzymeBean implements Serializable {
 				name = "reactionName";
 				break;
 			case "Sequences":
-				name = "ecNumber";
+				name = "taxId";
 				break;
 		}
 		return name;

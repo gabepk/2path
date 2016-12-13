@@ -98,9 +98,16 @@ public class ConectionDB implements Serializable {
 	public List<String> getJsonForEnzyme(String organism, String ec) {
 		JSONObject jsonObj;
 		JSONArray results, data;
-		String query_1, query_2, query_3;
-		String payload_1, payload_2, payload_3;
+		String query_0, query_1, query_2, query_3;
+		String payload_0, payload_1, payload_2, payload_3;
 		List<String> data_set = new ArrayList<>();
+		
+		// Verifica se enzima cataliza alguma recao
+		query_0 = "MATCH (e:Enzymes{ecNumber:\\\"" + ec + "\\\"}) RETURN e";
+		payload_0 = "{\"statements\" : [ {\"statement\" : \"" + query_0 + "\", \"parameters\": null," +
+				"\"resultDataContents\": [\"row\",\"graph\"],\"includeStats\": true} ] }";
+		String check_if_catalyses = sendTransactionalCypherQuery(payload_0);
+		
 		
 		query_1 = "MATCH (e:Enzymes{ecNumber:\\\"" + ec + "\\\"})-[c:CATALYSE]->(r:Reactions)" +
 					"-[p:PRODUCTOF]->(co:Compounds) RETURN e, c, r, p, co";
@@ -116,6 +123,11 @@ public class ConectionDB implements Serializable {
 		String enzyme_to_product = sendTransactionalCypherQuery(payload_2);
 		
 		try {
+			jsonObj = new JSONObject(check_if_catalyses);
+			results = jsonObj.getJSONArray("results");
+			data = ((JSONObject) results.get(0)).getJSONArray("data");
+			data_set.add(data.toString());
+			
 			jsonObj = new JSONObject(enzyme_to_substract);
 			results = jsonObj.getJSONArray("results");
 			data = ((JSONObject) results.get(0)).getJSONArray("data");
@@ -126,7 +138,7 @@ public class ConectionDB implements Serializable {
 			data = ((JSONObject) results.get(0)).getJSONArray("data");
 			data_set.add(data.toString());
 			
-			if (data_set.size() == 0) return null; // Enzima nao catalisa nenhuma reacao com substrato e produto
+			if (data_set.size() == 0) return null; // Enzima nao existe nem catalisa nenhuma reacao com substrato e produto
 
 			
 			if (organism != null && !organism.isEmpty()) {

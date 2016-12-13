@@ -138,7 +138,7 @@ public class SearchPathwayBean implements Serializable {
 					}
 					
 					// Nao inclui no's repetidos
-					if (! nodesD3.contains("{\"id\":\"" + node.getString("id")))
+					if (! nodesD3.contains("{\"id\":\"" + node.getString("id"))) {
 						nodesD3 += "\n{\"id\":\"" + node.getString("id") +
 								"\", \"name\":\"" + (node.getJSONObject("properties"))
 														 .getString(name)
@@ -149,6 +149,7 @@ public class SearchPathwayBean implements Serializable {
 															  .replace('\n', ' ')
 															  .replace('\t', ' ') +
 								"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
+					}
 				}
 				
 				for (int k = 0; k < relationshipGroup.length(); k++) {

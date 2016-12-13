@@ -1,8 +1,5 @@
 package com.system.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Enzyme {
 
 	private Integer id; // TODO: Mandatory
