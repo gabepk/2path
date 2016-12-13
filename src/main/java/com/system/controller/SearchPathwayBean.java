@@ -18,7 +18,7 @@ import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
 import org.primefaces.json.JSONObject;
 
-import com.system.service.SearchInOrganismServico;
+import com.system.service.SearchService;
 
 @Named
 @ManagedBean
@@ -28,7 +28,7 @@ public class SearchPathwayBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Inject
-	private SearchInOrganismServico searchInOrganismServico; 
+	private SearchService service; 
 	
 	@Inject
 	private HttpServletRequest request;
@@ -40,7 +40,7 @@ public class SearchPathwayBean implements Serializable {
 	public static List<String> compounds = new ArrayList<>();
 	
 	public void preRender() {
-		compounds = searchInOrganismServico.getAllCompounds();
+		compounds = service.getAllCompounds();
 		jsonGraphString = "";
 		substract = "";
 		product = "";
@@ -88,7 +88,7 @@ public class SearchPathwayBean implements Serializable {
 		
 		List<String> neo4jResponse = null;
 		if (substract != null && product != null) 
-			neo4jResponse = searchInOrganismServico.getJsonForPathway(organism, substract, product);
+			neo4jResponse = service.getJsonForPathway(organism, substract, product);
 
 		String allData;
 		allData = parseNeo4jResult(neo4jResponse);

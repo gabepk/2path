@@ -19,53 +19,34 @@
 	<ui:define name="body">
 		<f:metadata>
 			<fp:viewAction id="organismsViewAction" name="organisms"
-				action="#{searchInOrganismBean.preRender}" />
+				action="#{searchBean.preRender}" />
 		</f:metadata>
-		<div class="row" style="margin-top: 25px">
-			<p:messages autoUpdate="true" closable="true" />
-		</div>
 		<h:form>
 			<div class="row">
 				<div class="col-md-5">
-					<h2><i class="fa fa-users"></i> Search in the 2Path database</h2>
-					<br />
-					<p>When you don't select an organisms, you will search for all
-						the enzymes from the 2Path database.</p>
-					<p>
-						<p:commandButton class="btn btn-block btn-warning"
-							value="Search Enzyme" action="#{searchInOrganismBean.searchEnzyme}"
-							ajax="false" icon="ui-icon-search" />
-					</p>
-					<p>When you don't select an organism, you will search for all
-						the possible pathways from one compound (substract) to another (product).</p>
-					<p>
-						<p:commandButton class="btn btn-block btn-warning"
-							value="Search Pathway" action="#{searchInOrganismBean.searchPathway}"
-							ajax="false" icon="ui-icon-search" />
-					</p>
-				</div>
-				<div class="col-md-1"></div>
-				<div class="col-md-5">
-					<h2><i class="fa fa-user fa-3"></i> Search in one Organism</h2>
+					<h3>Search Page</h3>
+					<h4><i class="fa fa-users"></i> Public: Search on all database</h4>
+					<h4><i class="fa fa-user fa-3"></i> Private: Search on your organism</h4>
 					<br />
 					<div class="logged-in">
 						<div class="row">
 							<div class="col-md-12">
 								<p:outputLabel for="organismId" value="Organism:" />
 								<p:selectOneMenu id="organismId" label="Organism"
-									value="#{searchInOrganismBean.organismSelected}"
-									style="width:100%" converter="organismConverter" filter="true"
-									required="true">
-									<f:selectItems value="#{searchInOrganismBean.organisms}"
-										var="org" itemLabel="#{org.label}" itemValue="#{org}" />
+									value="#{searchBean.organismSelected}"
+									style="width:100%"  filter="true">
+									<f:selectItem itemLabel="All database" itemValue="" />
+									<f:selectItems value="#{searchBean.organisms}"
+										var="org" itemLabel="#{org}" itemValue="#{org}" />
 								</p:selectOneMenu>
 							</div>
 						</div>
 						<div class="row" style="margin-top: 25px">
 							<div class="col-md-6">
 								<p>
-									Discover if the enzyme you are looking for is on your Organism by giving 
-									it's EC number. Find out the reactions it can catalyze on terpenoids. 
+									Discover if the enzyme you are looking for is on your Organism or on
+									the complete 2Path database by giving it's EC number. 
+									Find out the reactions it can catalyze on terpenoids. 
 									The reactions come with their description, Kegg ID and link and type.
 								</p>
 							</div>
@@ -81,76 +62,23 @@
 							<div class="col-md-6">
 								<p>
 									<p:commandButton class="btn btn-block btn-success"
-										value="Search Enzyme in Organims" for="organismId"
-										action="#{searchInOrganismBean.searchEnzymeInOrganism}"
+										value="Search Enzyme" for="organismId"
+										action="#{searchBean.searchEnzyme}"
 										ajax="false" icon="ui-icon-search" />
 								</p>
 							</div>
 							<div class="col-md-6">
 								<p>
 									<p:commandButton class="btn btn-block btn-success"
-										value="Search Pathway in Organism" for="organismId"
-										action="#{searchInOrganismBean.searchPathwayInOrganism}"
+										value="Search Pathway" for="organismId"
+										action="#{searchBean.searchPathway}"
 										ajax="false" icon="ui-icon-search" />
 								</p>
 							</div>
 						</div>
 					</div>
-					<div class="not-logged-in">
-						<h3>Upload you own Organism</h3>
-						<p>
-							This optional feature allows you to search a chemical component
-							or a pathway between two components in your private FASTA files
-							uploaded in our system and merged with our public database. <b>Don't
-								worry</b>, other users won't have access to your private data. The
-							merged database is made entirely for you. Just login and upload.
-							<br /> <br />
-						</p>
-						<div class="row">
-							<div class="col-md-2">
-								<br />
-								<h4>
-									<i class="fa fa-sign-in" aria-hidden="true"></i> Login
-								</h4>
-							</div>
-							<div class="col-md-1">
-								<h2>
-									<i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-								</h2>
-							</div>
-							<div class="col-md-3">
-								<h4>
-									<p:graphicImage library="images" name="fasta-icon.png"
-										style="width:35%;height:35%;" />
-									Upload
-								</h4>
-							</div>
-							<div class="col-md-1">
-								<h2>
-									<i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-								</h2>
-							</div>
-							<div class="col-md-2">
-								<br />
-								<h4>
-									<i class="fa fa-code-fork" aria-hidden="true"></i> Merge
-								</h4>
-							</div>
-							<div class="col-md-1">
-								<h2>
-									<i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-								</h2>
-							</div>
-							<div class="col-md-2">
-								<br />
-								<h4>
-									<i class="fa fa-search" aria-hidden="true"> Search</i>
-								</h4>
-							</div>
-						</div>
-					</div>
 				</div>
-				<div class="col-md-1"></div>
+				<div class="col-md-7"></div>
 			</div>
 		</h:form>
 	</ui:define>

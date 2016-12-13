@@ -24,10 +24,9 @@
 }
 
 .logged-in {
-	display:none;
-}
-
-.not-logged-in {
 	/*display:none;*/
 }
 
+.not-logged-in {
+	display:none;
+}

@@ -17,7 +17,7 @@ import org.primefaces.json.JSONArray;
 import org.primefaces.json.JSONException;
 import org.primefaces.json.JSONObject;
 
-import com.system.service.SearchInOrganismServico;
+import com.system.service.SearchService;
 
 @Named
 @ManagedBean
@@ -27,7 +27,7 @@ public class SearchEnzymeBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Inject
-	private SearchInOrganismServico searchInOrganismServico; 
+	private SearchService service; 
 	
 	@Inject
 	private HttpServletRequest request;
@@ -70,7 +70,7 @@ public class SearchEnzymeBean implements Serializable {
 		
 		List<String> neo4jResponse = null;
 		if (ec != null) 
-			neo4jResponse = searchInOrganismServico.getJsonForEnzyme(organism, ec);
+			neo4jResponse = service.getJsonForEnzyme(organism, ec);
 		
 		String allData;
 		allData = parseNeo4jResult(neo4jResponse);

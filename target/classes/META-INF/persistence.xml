@@ -6,14 +6,10 @@
     <persistence-unit name="appJpaUnit">
         <provider>com.orientechnologies.orient.object.jpa.OJPAPersistenceProvider</provider>
 
-        <!-- JPA entities must be registered here -->
-
         <properties>
             <property name="javax.persistence.jdbc.url" value="remote:localhost/test.odb" />
             <property name="javax.persistence.jdbc.user" value="admin" />
             <property name="javax.persistence.jdbc.password" value="admin" />
-            <!-- Register whole package.
-                             See com.orientechnologies.orient.core.entity.OEntityManager.registerEntityClasses(String) for more details -->
             <property name="com.orientdb.entityClasses" value="com.system.model" />
         </properties>
     </persistence-unit>
