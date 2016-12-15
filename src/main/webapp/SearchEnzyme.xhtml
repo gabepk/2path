@@ -43,14 +43,13 @@
 						<p:button value="Return to Search Page" class="btn btn-block btn-warning"
 						outcome="Search.xhtml" icon="ui-icon-arrowthick-1-w"/>
 					</div>
-					
-					<h3 style="margin-top:25px" >Labels </h3>
-					<div style="margin-top:5px">
+					<div style="margin-top:75px">
 						<p:graphicImage library="images" name="legenda.png"
-						style="width:75%;height:75%;" />
+						style="width:180px; height:100px;" />
 					</div>
 				</div>
 				<div class="col-md-9">
+					<div class="node_label"><br/><br/><br/><br/><br/></div>
 				    <input id="graph_json" type='hidden' value="#{searchEnzymeBean.jsonGraphString}" />
 					<h:outputStylesheet library="css" name="graphStyle.css" />
 					<svg id="graphView"></svg>
