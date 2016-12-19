@@ -52,7 +52,8 @@ public class SearchEnzymeBean implements Serializable {
 		String resultValue = "";
 		String json = buildGraph();
 		
-		if (json.replaceAll("\\s+","").equals("{\"nodes\":[],\"links\":[]}")) {
+		// Verifica se grafo está vazio
+		if (json.equals("{\"nodes\":[],\"links\":[]}")) {
 			resultValue = (organism.isEmpty()) ? "Enzyme not found" : "Enzyme not found in organism " + organism;
 			message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",  resultValue);
 		}
@@ -60,7 +61,8 @@ public class SearchEnzymeBean implements Serializable {
 			resultValue = (organism.isEmpty()) ? "Enzyme found" : "Enzyme found in organism " + organism;
 			message = new FacesMessage("Successful",  resultValue);
 		}
-				
+		
+		// Adiciona mensagem de erro ou sucesso na tela
 		context.addMessage(null, message);
 		jsonGraphString = json;
 	}
@@ -74,27 +76,24 @@ public class SearchEnzymeBean implements Serializable {
 			neo4jResponse = service.getJsonForEnzyme(organism, ec);
 		
 		String allData;
-		allData = parseNeo4jResult(neo4jResponse);
+		allData = parseNeo4jResult(neo4jResponse).replaceAll("\\s+","");
 
-		return allData
-				.replaceAll("\\s+","")
-				.equals("{\"nodes\":[],\"links\":[]}") 
-				? "{\"nodes\":[],\"links\":[]}" 
-				: allData; // Retorna "" se grafo eh vazio
+		return allData.equals("{\"nodes\":[],\"links\":[]}")
+				? "{\"nodes\":[],\"links\":[]}" // Retorna "" se grafo eh vazio
+				: allData;
 	}
 	
 	private String parseNeo4jResult(List<String> jsonObj) {
 		String nodesD3 = "", linksD3 = "";
-		String name, propertie;
+		String[] nodeProperties = new String[3];
 		
 		if (jsonObj == null)
 			return "{ \"nodes\": [], \"links\": [] }";
 		
 		try {
-			// Armazena primeiro todas as arestas, exceto a CATALYSE
 			for (int i = 0; i < jsonObj.size(); i ++) {
 				JSONArray data = new JSONArray(jsonObj.get(i));
-				JSONArray nodeGroup, relationshipGroup, reactions;
+				JSONArray nodeGroup, relationshipGroup;
 				JSONObject graph, node, relationship;
 				
 				for (int j = 0; j < data.length(); j++) {
@@ -102,6 +101,7 @@ public class SearchEnzymeBean implements Serializable {
 					nodeGroup = graph.getJSONArray("nodes");
 					relationshipGroup = graph.getJSONArray("relationships");
 					
+					// Adiciona todas as arestas
 					for (int k = 0; k < relationshipGroup.length(); k++) {
 						relationship = ((JSONObject) relationshipGroup.get(k));
 						linksD3 += "\n{\"source\":\"" + relationship.getString("startNode") +
@@ -109,23 +109,25 @@ public class SearchEnzymeBean implements Serializable {
 								"\", \"type\":\"" + relationship.getString("type") +"\"},";					
 					}
 					
+					// Adiciona todos os nós
 					for (int k = 0; k < nodeGroup.length(); k++) {
 						node = ((JSONObject) nodeGroup.get(k));
-						name = getName( ((String) (node.getJSONArray("labels")).get(0)) );
-						propertie = getPropertie( ((String) (node.getJSONArray("labels")).get(0)) );
+						relationshipGroup = graph.getJSONArray("relationships");
+						nodeProperties = getNodeProperties(nodeProperties, ((String) (node.getJSONArray("labels")).get(0)) );
 						
 						// Nao inclui no's repetidos
 						if (!nodesD3.contains("{\"id\":\"" + node.getString("id"))) {
 							nodesD3 += "\n{\"id\":\"" + node.getString("id") +
-									"\", \"name\":\"" + (node.getJSONObject("properties"))
-														.getString(name)
+									"\", \"name\":\"" + (node.getJSONObject("properties")) // Nome para aparecer no nó na interface
+														.getString(nodeProperties[0])
 														.replaceAll("\\n+", "")
 														.replaceAll("\\t+", "") +
-									"\", \"propertie\":\"" + (node.getJSONObject("properties"))
-															.getString(propertie)
+									"\", \"propertie\":\"" + (node.getJSONObject("properties")) // Uma propriedade do nó
+															.getString(nodeProperties[1])
 															.replaceAll("\\n+", "").
 															replaceAll("\\t+", "") +
-									"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) + "\"},";
+									"\", \"label\":\"" + ((String) (node.getJSONArray("labels")).get(0)) +
+									"\", \"color\":\"" + nodeProperties[2] + "\"},";
 						}
 					}
 					
@@ -147,48 +149,35 @@ public class SearchEnzymeBean implements Serializable {
 			"], \"links\": [ " + linksD3.substring(0, linkLenght) + "]}";
 	}
 	
-	private String getName(String label) {
-		String name = "";
-		switch (label) {
+	private String[] getNodeProperties(String[] nodeProperties, String name) {
+		switch (name) {
 			case "Organism":
-				name = "taxName";
+				nodeProperties[0] = "taxame"; // NOME
+				nodeProperties[1] = "taxId"; // PROPRIEDADE
+				nodeProperties[2] = "#77f"; // COR
 				break;
 			case "Compounds":
-				name = "compoundName";
+				nodeProperties[0] = "compoundName"; 
+				nodeProperties[1] = "keggID_compound"; 
+				nodeProperties[2] = "#7f7"; 
 				break;
 			case "Enzymes":
-				name = "ecNumber";
+				nodeProperties[0] = "enzymeName";
+				nodeProperties[1] = "ecNumber"; 
+				nodeProperties[2] = "#ff7"; 
 				break;
 			case "Reactions":
-				name = "reactionName";
+				nodeProperties[0] = "reactionDescription";
+				nodeProperties[1] = "keggID_Reaction"; 
+				nodeProperties[2] = "#f77"; 
 				break;
 			case "Sequences":
-				name = "taxId";
+				nodeProperties[0] = "taxId";
+				nodeProperties[1] = "seqFasta"; 
+				nodeProperties[2] = "#7ff"; 
 				break;
 		}
-		return name;
-	}
-	
-	private String getPropertie (String label) {
-		String name = "";
-		switch (label) {
-			case "Organism":
-				name = "taxRefs";
-				break;
-			case "Compounds":
-				name = "keggID_compound";
-				break;
-			case "Enzymes":
-				name = "enzymeName";
-				break;
-			case "Reactions":
-				name = "keggID_Reaction";
-				break;
-			case "Sequences":
-				name = "seqFasta";
-				break;
-		}
-		return name;
+		return nodeProperties;
 	}
 	
 	public String getEc() {
