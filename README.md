@@ -5,7 +5,7 @@
 
 The 2Path interface allows users to search for either an enzyme or a pathway between two metabolites on a selected organism from the database. If there is enzyme or pathway, it shows a graph where the nodes can be an enzyme, a reaction or a compound.
 
-%![](https://github.com/gabepk/2path/blob/master/src/main/webapp/resources/images/enzyme_graph.png)
+![enzyme_graph](https://github.com/gabepk/2path/blob/master/src/main/webapp/resources/images/enzyme.png)
 
 ## Implementation
 The _back-end_ is in Java and the data are accessed remotely with the Neo4j API.
