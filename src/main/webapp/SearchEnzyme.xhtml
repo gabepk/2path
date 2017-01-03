@@ -12,49 +12,50 @@
 
 	<ui:define name="body">
 		<f:metadata>
-			<fp:viewAction id="enzymesViewAction" name="enzymes"
+			<fp:viewAction id="compoundsViewAction" name="compounds"
 				action="#{searchEnzymeBean.preRender}" />
 		</f:metadata>
 		<h:form>
+			<p:growl id="growl" showDetail="true" autoUpdate="true"
+			infoStyle="color:darkgreen" errorStyle="color:darkred" /> 
 			<div class="row">
 				<div class="col-md-3">
-					<div class="row" style="margin-top: 25px">
-						<p:messages autoUpdate="true" closable="true" />
+					<div style="margin-bottom: 20px">
+						<h3>Search for an enzyme</h3>
 					</div>
-					<h2>Search for an enzyme</h2>
 					<h:panelGroup>
-
-						<p:outputLabel value="Enzyme" for="searchInput" />
-						<p:autoComplete id="searchInput" value="#{searchEnzymeBean.ec}"
-							completeMethod="#{searchEnzymeBean.suggestKeywords}"
-							required="true" forceSelection="false" var="key"
-							itemLabel="#{key}" itemValue="#{key}"
-							style="margin-top:20px; margin-bottom:50px" maxResults="10" />
+						<p:outputLabel value="EC Number" for="searchInput" />
+						<p:inputText id="searchInput" value="#{searchEnzymeBean.ec}" required="true"
+						var="key" itemLabel="#{key}" itemValue="#{key}"
+						style="margin-top:5px; margin-bottom:5px" />
 						<p:watermark for="searchInput" value="Enter an EC number"
 							id="watermark" />
-						<div style="margin-top:50px;">
-							<p:commandButton class="btn btn-block btn-success" value="Search"
-								for="searchInput"
-								action="#{searchEnzymeBean.searchEnzymeInOrganism}" ajax="false"
-								icon="ui-icon-search" update="graphView">
-							</p:commandButton>
-						</div>
 					</h:panelGroup>
-				</div>
-				<div class="col-md-1"></div>
-				<div class="col-md-3">
-					<div style="margin-top:50px; border-bottom: dotted #707070;">
-						<h2 style="margin-bottom:50px" >Result: </h2>
-						<h:outputText id="result" binding="#{searchEnzymeBean.result}"/> 
+					
+					<div style="margin-top:5px;">
+						<p:commandButton class="btn btn-block btn-info" value="Search"
+							for="searchInput" icon="ui-icon-search" update="growl"
+							action="#{searchEnzymeBean.searchEnzymeInOrganism}" ajax="false">
+						</p:commandButton>
 					</div>
 					
-					<div style="margin-top:50px">
-						<p:button outcome="ViewGraph.xhtml" value="View interactive data"
-						  class="btn btn-block btn-success" >
-						</p:button>
+					<div style="margin-top:20px;">
+						<p:button value="Return to Search Page" class="btn btn-block btn-warning"
+						outcome="Search.xhtml" icon="ui-icon-arrowthick-1-w"/>
+					</div>
+					<div style="margin-top:75px">
+						<p:graphicImage library="images" name="legenda.png"
+						style="width:180px; height:150px;" />
 					</div>
 				</div>
-				<div class="col-md-5"></div>
+				<div class="col-md-9">
+					<div class="node_label"><br/><br/><br/><br/><br/></div>
+				    <input id="graph_json" type='hidden' value="#{searchEnzymeBean.jsonGraphString}" />
+					<h:outputStylesheet library="css" name="graphStyle.css" />
+					<svg id="graphView"></svg>
+					<script src="resources/js/d3.v4.min.js"></script>
+					<script src="resources/js/graphController.js"></script>
+				</div>
 			</div>
 		</h:form>
 	</ui:define>

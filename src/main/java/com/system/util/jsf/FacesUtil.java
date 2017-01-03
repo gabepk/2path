@@ -2,7 +2,6 @@ package com.system.util.jsf;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.view.facelets.FaceletException;
 
 public class FacesUtil {
 

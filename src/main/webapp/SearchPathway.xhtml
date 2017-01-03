@@ -16,54 +16,50 @@
 				action="#{searchPathwayBean.preRender}" />
 		</f:metadata>
 		<h:form>
+			<p:growl id="growl" showDetail="true" autoUpdate="true" 
+			infoStyle="color:darkgreen" errorStyle="color:darkred" /> 
 			<div class="row">
 				<div class="col-md-3">
-					<div class="row" style="margin-top: 25px">
-						<p:messages autoUpdate="true" closable="true" />
+					<div style="margin-bottom: 20px">
+						<h3>Search for a pathway between two components</h3>
 					</div>
-					<h2>
-						Search for a pathway
-					</h2>
-					<p>
-						Enter the name of a Compound
-					</p>
 					<h:panelGroup>
-						
-						<p:outputLabel value="From" for="searchInput_1"/>
+						<p:outputLabel value="From Component" for="searchInput_1"/>
 						<p:autoComplete id="searchInput_1" value="#{searchPathwayBean.substract}" 
 							completeMethod="#{searchPathwayBean.suggestKeywords}" required="true"
 							forceSelection="false" var="key_1" itemLabel="#{key_1}" itemValue="#{key_1}" 
 							style="margin-top:20px; margin-bottom:50px" maxResults="10"/>
 						<p:watermark for="searchInput_1" value="Enter a substract" id="watermark_1" />
 					
-						<p:outputLabel value="To" for="searchInput_2"/>
+						<p:outputLabel value="To Component" for="searchInput_2"/>
 						<p:autoComplete id="searchInput_2" value="#{searchPathwayBean.product}" 
 							completeMethod="#{searchPathwayBean.suggestKeywords}" required="true"
 							forceSelection="false" var="key_2" itemLabel="#{key_2}" itemValue="#{key_2}" 
 							style="margin-top:20px; margin-bottom:50px" maxResults="10"/>
 						<p:watermark for="searchInput_2" value="Enter a product" id="watermark_2" />
-					
-						<div style="margin-top:50px;">
-							<p:commandButton class="btn btn-block btn-success" value="Search"
-						   	 for="searchInput_1, searchInput_2" action="#{searchPathwayBean.searchPathwayInOrganism}" 
-						   	 ajax="false" icon="ui-icon-search" update="graphView" />
-						</div>
 					</h:panelGroup>	
-				</div>
-				<div class="col-md-1"></div>
-				<div class="col-md-3">
-					<div style="margin-top:50px; border-bottom: dotted #707070;">
-						<h2 style="margin-bottom:50px" >Result: </h2>
-						<h:outputText id="result" binding="#{searchPathwayBean.result}"/> 
+					<div style="margin-top:5px;">
+						<p:commandButton class="btn btn-block btn-info" value="Search"
+					   	 for="searchInput_1, searchInput_2" action="#{searchPathwayBean.searchPathwayInOrganism}" 
+					   	 ajax="false" icon="ui-icon-search" update="growl" />
 					</div>
-					
-					<div style="margin-top:50px">
-						<p:button outcome="ViewGraph.xhtml" value="View interactive data"
-						  class="btn btn-block btn-success" >
-						</p:button>
+					<div style="margin-top:20px;">
+						<p:button value="Return to Search Page" class="btn btn-block btn-warning"
+						outcome="Search.xhtml" icon="ui-icon-arrowthick-1-w"/>
 					</div>
+					<div style="margin-top:75px">
+						<p:graphicImage library="images" name="legenda.png"
+						style="width:180px; height:180px;" />
+					</div>					
 				</div>
-				<div class="col-md-5"></div>
+				<div class="col-md-9">
+					<div class="node_label"><br/><br/><br/><br/><br/></div>
+					<h:outputStylesheet library="css" name="graphStyle.css" />
+					<input id="graph_json" type='hidden' value="#{searchPathwayBean.jsonGraphString}" />
+					<svg id="graphView"></svg>
+					<script src="resources/js/d3.v4.min.js"></script>
+					<script src="resources/js/graphController.js"></script>
+				</div>
 			</div>
 		</h:form>
 	</ui:define>
